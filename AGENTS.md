@@ -2,6 +2,8 @@
 
 This file describes the architecture, conventions, and key decisions in **Tennis-Mixer** so that AI agents can contribute effectively.
 
+> **Language policy:** All project files, code comments, commit messages, test descriptions, and documentation must be written in **English** — regardless of the language used in prompts or conversations.
+
 ---
 
 ## Architecture Overview
@@ -91,6 +93,9 @@ The **only stateful component**. Responsibilities:
 | `npm run dev` | Vite dev server on http://localhost:5173 |
 | `npm run build` | TypeScript check + Vite production build to `dist/` |
 | `npm run preview` | Serve the `dist/` build locally |
+| `npm test` | Vitest (single run) |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run coverage` | Test coverage with v8 |
 | `npm run storybook` | Storybook dev server on http://localhost:6006 |
 | `npm run build-storybook` | Static Storybook build to `storybook-static/` |
 
@@ -115,6 +120,41 @@ Stories live in `src/stories/`. The Storybook framework is `@storybook/react-vit
 
 ---
 
-## Testing
+## Testing & TDD
 
-There are currently **no automated tests**. Before adding tests, prefer targeting `src/lib/tennis.ts` (pure functions, easy to unit-test) and `src/lib/storage.ts` (mock `window.storage` and `localStorage`).
+Tests live in `src/lib/__tests__/`. Framework: **Vitest** with a jsdom environment.
+
+### Test files
+
+| File | Coverage |
+|---|---|
+| `tennis.test.ts` | `pairKey`, `serverFor`, `initState`, `computeNext` |
+| `storage.test.ts` | `loadState`, `saveState`, `pollSharedState` (with mocked `window.storage` / `localStorage`) |
+
+### TDD workflow
+
+**Always develop new logic in `src/lib/` test-first:**
+
+1. **Red** — Write a test that describes the desired behaviour. It must fail.
+2. **Green** — Write the minimal implementation to make the test pass.
+3. **Refactor** — Clean up without breaking tests. `npm test` must stay green.
+
+**Rules:**
+- No new public functions in `tennis.ts` or `storage.ts` without a corresponding test.
+- Tests describe **behaviour**, not implementation details. Internals (`recordCurrent`, `MEM`) are tested indirectly through the public API.
+- Storage tests mock `window.storage` via `window.storage = { get: vi.fn(), set: vi.fn() }` and call `vi.resetModules()` in `beforeEach` to prevent the in-memory fallback (module-level variable) from leaking between tests.
+- Verify `GameState` immutability in tests: capture the state before calling, compare after.
+- For functions with randomness (`initState`, `computeNext`), test invariants (e.g. player count, no mutation) — not exact outputs.
+
+### Targeted test commands
+
+```bash
+# Single file
+npx vitest run src/lib/__tests__/tennis.test.ts
+
+# All tests
+npm test
+
+# Watch mode during development
+npm run test:watch
+```
