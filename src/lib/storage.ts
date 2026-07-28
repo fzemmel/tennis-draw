@@ -1,6 +1,8 @@
 import type { GameState, SyncMode } from "./types";
+import { PLAYERS } from "./tennis";
 
 const STORAGE_KEY = "tennis_state_v1";
+const POOL_KEY = "tennis_pool_v1";
 
 /** In-Memory-Fallback für Vorschau-Umgebungen ohne localStorage. */
 const MEM: { current: GameState | null } = { current: null };
@@ -82,4 +84,22 @@ export async function pollSharedState(): Promise<GameState | null> {
     // Ignorieren
   }
   return null;
+}
+
+export function loadPlayerPool(): string[] {
+  try {
+    const raw = localStorage.getItem(POOL_KEY);
+    if (raw) return JSON.parse(raw) as string[];
+  } catch {
+    // Fall through to default
+  }
+  return [...PLAYERS];
+}
+
+export function savePlayerPool(pool: string[]): void {
+  try {
+    localStorage.setItem(POOL_KEY, JSON.stringify(pool));
+  } catch {
+    // Ignore — pool is non-critical, game can restart with defaults
+  }
 }

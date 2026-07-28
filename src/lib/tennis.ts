@@ -1,6 +1,6 @@
 import type { GameState, ChangeEvent, ServerInfo } from "./types";
 
-export const PLAYERS = ["Fidschi", "Nic", "Alex", "Benni", "Teja"] as const;
+export const PLAYERS = ["Teja", "Nic", "Benni", "Alex", "Andre", "Fidschi"];
 
 export function pairKey(a: string, b: string): string {
   return [a, b].sort().join("|");
@@ -43,9 +43,7 @@ function recordCurrent(
 }
 
 export function initState(players: readonly string[]): GameState {
-  const shuffled = [...players].sort(() => Math.random() - 0.5);
-  const bench = shuffled[4];
-  const [p0, p1, p2, p3] = shuffled;
+  const [p0, p1, p2, p3, bench] = players;
   const home: [string, string] = [p0, p1];
   const guest: [string, string] = [p2, p3];
 

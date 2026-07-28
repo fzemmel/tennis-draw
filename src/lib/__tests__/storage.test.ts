@@ -161,3 +161,57 @@ describe("pollSharedState", () => {
     expect(result).toBeNull();
   });
 });
+
+// ---------------------------------------------------------------------------
+// loadPlayerPool / savePlayerPool
+// ---------------------------------------------------------------------------
+describe("loadPlayerPool", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("returns the default PLAYERS pool when nothing is stored", async () => {
+    const { loadPlayerPool } = await import("../storage");
+    const { PLAYERS } = await import("../tennis");
+    const pool = loadPlayerPool();
+    expect(pool).toEqual([...PLAYERS]);
+  });
+
+  it("returns the saved pool from localStorage", async () => {
+    const customPool = ["Alice", "Bob", "Carol", "Dave", "Eve"];
+    localStorage.setItem("tennis_pool_v1", JSON.stringify(customPool));
+    const { loadPlayerPool } = await import("../storage");
+    expect(loadPlayerPool()).toEqual(customPool);
+  });
+
+  it("falls back to the default pool when localStorage contains invalid JSON", async () => {
+    localStorage.setItem("tennis_pool_v1", "not-json");
+    const { loadPlayerPool } = await import("../storage");
+    const { PLAYERS } = await import("../tennis");
+    expect(loadPlayerPool()).toEqual([...PLAYERS]);
+  });
+});
+
+describe("savePlayerPool", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("persists the pool to localStorage", async () => {
+    const pool = ["Alice", "Bob", "Carol", "Dave", "Eve"];
+    const { savePlayerPool } = await import("../storage");
+    savePlayerPool(pool);
+    expect(JSON.parse(localStorage.getItem("tennis_pool_v1")!)).toEqual(pool);
+  });
+
+  it("round-trips correctly via loadPlayerPool", async () => {
+    const pool = ["X1", "X2", "X3", "X4", "X5", "X6"];
+    const { savePlayerPool, loadPlayerPool } = await import("../storage");
+    savePlayerPool(pool);
+    expect(loadPlayerPool()).toEqual(pool);
+  });
+});
