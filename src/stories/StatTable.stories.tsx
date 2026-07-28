@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatTable } from "../components/TennisMixer/StatTable";
 
 const meta: Meta<typeof StatTable> = {
