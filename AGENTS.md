@@ -102,6 +102,26 @@ The **only stateful component**. Responsibilities:
 
 ---
 
+## CI / CD
+
+Two GitHub Actions workflows live in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | push / PR → `main` | Lint (`npm run lint`) + Test (`npm test`) |
+| `deploy.yml` | push / PR → `main` | Lint + Test, then deploy to **Vercel** |
+
+**deploy.yml jobs:**
+1. `ci` — lint and test (must pass before deploy)
+2. `deploy` — runs `vercel pull / build / deploy` via the Vercel CLI
+   - Push to `main` → production deploy (`--prod`)
+   - Pull request → preview deploy; URL is posted as a PR comment
+
+**Required repository secrets:** `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+See `README.md` → *Deployment* for setup instructions.
+
+---
+
 ## Gotchas & Important Notes
 
 ### Hardcoded player list
