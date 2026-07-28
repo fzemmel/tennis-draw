@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] – 2026-07-28
+
+### Added
+- Automated deployment to **Vercel** via GitHub Actions (`deploy.yml`)
+  - Push to `main` triggers a production deploy
+  - Pull requests get an isolated preview deployment; the URL is posted automatically as a PR comment
+- `vercel.json` — build config and SPA rewrites so direct URL navigation doesn't 404
+- CI/CD section in `AGENTS.md` documenting the workflow structure and required secrets
+
 ## [0.1.0] – 2026-07-28
 
 ### Added
@@ -19,5 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vitest test suite (38 tests) for `tennis.ts` and `storage.ts` with jsdom environment and v8 coverage
 - ESLint flat config (`eslint.config.js`) with TypeScript, React Hooks, and React Refresh rules
 
-[Unreleased]: https://github.com/fzemmel/tennis-draw/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/fzemmel/tennis-draw/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/fzemmel/tennis-draw/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/fzemmel/tennis-draw/releases/tag/v0.1.0

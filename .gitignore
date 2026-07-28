@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 storybook-static/
+*.tsbuildinfo
 
 # macOS
 .DS_Store
@@ -28,3 +29,5 @@ yarn-error.log*
 
 # PWA
 dev-dist/
+.vercel
+.env*

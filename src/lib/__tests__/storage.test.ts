@@ -33,7 +33,6 @@ describe("loadState", () => {
     // reset localStorage
     localStorage.clear();
     // remove window.storage
-    // @ts-expect-error – intentionally deleting the optional property
     delete window.storage;
   });
 
@@ -85,7 +84,6 @@ describe("saveState", () => {
   beforeEach(() => {
     vi.resetModules();
     localStorage.clear();
-    // @ts-expect-error – intentionally deleting the optional property for test isolation
     delete window.storage;
   });
 
@@ -133,7 +131,6 @@ describe("saveState", () => {
 describe("pollSharedState", () => {
   beforeEach(() => {
     vi.resetModules();
-    // @ts-expect-error – intentionally deleting the optional property for test isolation
     delete window.storage;
   });
 
