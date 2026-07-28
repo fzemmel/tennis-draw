@@ -90,6 +90,7 @@ The **only stateful component**. Responsibilities:
 
 | Command | Description |
 |---|---|
+| `npm run lint` | ESLint (flat config, TypeScript + React rules) |
 | `npm run dev` | Vite dev server on http://localhost:5173 |
 | `npm run build` | TypeScript check + Vite production build to `dist/` |
 | `npm run preview` | Serve the `dist/` build locally |
