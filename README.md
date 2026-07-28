@@ -94,6 +94,31 @@ src/
 └── main.tsx
 ```
 
+## Deployment
+
+The app is automatically deployed to **Vercel** on every push to `main`.
+
+🚀 **Live:** https://tennis-mixer.vercel.app
+
+Every pull request gets its own **preview URL**, posted automatically as a PR comment.
+
+### Setting up Vercel (one-time)
+
+1. Create a project on [vercel.com](https://vercel.com) and import this repository.
+2. Vercel will auto-detect Vite — no extra framework config needed.
+3. Add the following secrets to the GitHub repository (**Settings → Secrets → Actions**):
+
+| Secret | Where to find it |
+|---|---|
+| `VERCEL_TOKEN` | Vercel dashboard → Account Settings → Tokens |
+| `VERCEL_ORG_ID` | `.vercel/project.json` after `vercel link` |
+| `VERCEL_PROJECT_ID` | `.vercel/project.json` after `vercel link` |
+
+```bash
+# Run locally once to generate .vercel/project.json:
+npx vercel link
+```
+
 ## License
 
 MIT
