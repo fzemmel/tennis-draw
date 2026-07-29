@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete Storybook coverage for every UI component, including representative splash-screen, synchronization, statistics, and language-selection states
 - Contribution policy requiring Storybook updates in the same pull request as UI changes
 - Root-level `CLAUDE.md` that imports `AGENTS.md` so Claude Code uses the canonical repository guidance without duplicating shared instructions
+- Vercel Web Analytics integration for privacy-conscious Production and Preview page-view reporting
 
 ## [0.2.0] – 2026-07-28
 

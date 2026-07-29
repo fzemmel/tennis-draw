@@ -105,6 +105,14 @@ The app is automatically deployed to **Vercel** on every push to `main`.
 
 Every pull request gets its own **preview URL**, posted automatically as a PR comment.
 
+### Web Analytics
+
+Vercel Web Analytics records standard page views through `@vercel/analytics`. Analytics data is available from the project's **Analytics** tab in the Vercel dashboard and can be filtered by Production or Preview environment.
+
+The application does not send custom analytics events, player names, or game-state values.
+
+Enable Web Analytics once from the project's **Analytics** tab or for a linked project with `npx vercel project web-analytics --format json` before verifying the first deployment.
+
 ### Setting up Vercel (one-time)
 
 1. Create a project on [vercel.com](https://vercel.com) and import this repository.
