@@ -73,7 +73,7 @@ export function Splashscreen({
     dragOverIndex.current = null;
   }
 
-  const canStart = selected.length === 5;
+  const canStart = selected.length >= 5;
   const customPlayers = pool.filter((p) => !PLAYERS.includes(p));
 
   return (
@@ -169,7 +169,7 @@ export function Splashscreen({
           ) : (
             <div className="flex flex-col gap-1.5">
               {selected.map((name, index) => {
-                const isBench = index === selected.length - 1 && selected.length === 5;
+              const isBench = index >= 4 && selected.length >= 5;
                 const isDragging = dragIndex === index;
                 return (
                   <div
@@ -200,11 +200,6 @@ export function Splashscreen({
             </div>
           )}
 
-          {selected.length > 5 && (
-            <p className="text-yellow-400 text-xs mt-2 text-center">
-              {t.splash.exactFive(selected.length)}
-            </p>
-          )}
           {selected.length < 5 && selected.length > 0 && (
             <p className="text-yellow-400 text-xs mt-2 text-center">
               {t.splash.moreNeeded(5 - selected.length)}

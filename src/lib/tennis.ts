@@ -46,7 +46,7 @@ export function initState(players: readonly string[]): GameState {
   if (players.length < 5) {
     throw new Error(`initState requires at least 5 players, got ${players.length}`);
   }
-  const [p0, p1, p2, p3, bench] = players;
+  const [p0, p1, p2, p3, ...benchPlayers] = players;
   const home: [string, string] = [p0, p1];
   const guest: [string, string] = [p2, p3];
 
@@ -63,7 +63,9 @@ export function initState(players: readonly string[]): GameState {
   [p0, p1, p2, p3].forEach((p) => {
     playCount[p] = 1;
   });
-  benchCount[bench] = 1;
+  benchPlayers.forEach((p) => {
+    benchCount[p] = 1;
+  });
 
   const partnerCount: Record<string, number> = {
     [pairKey(home[0], home[1])]: 1,
@@ -83,7 +85,7 @@ export function initState(players: readonly string[]): GameState {
   return {
     home,
     guest,
-    bench,
+    bench: benchPlayers,
     playCount,
     benchCount,
     serveCount,
@@ -98,7 +100,7 @@ export function initState(players: readonly string[]): GameState {
 
 /** Berechnet den nächsten optimalen Wechsel, ohne den State zu mutieren. */
 export function computeNext(s: GameState): GameState {
-  const incoming = s.bench;
+  const incoming = s.bench[0];
   const court = [...s.home, ...s.guest];
   let candidates = court.filter((p) => p !== s.lastIn);
   if (candidates.length === 0) candidates = court;
@@ -147,11 +149,14 @@ export function computeNext(s: GameState): GameState {
   playCount[incoming] = (playCount[incoming] || 0) + 1;
   benchCount[out] = (benchCount[out] || 0) + 1;
 
+  // FIFO bench queue: remove first (incoming), append outgoing player at end
+  const newBench = [...s.bench.slice(1), out];
+
   const ns: GameState = {
     ...s,
     home: newHome,
     guest: newGuest,
-    bench: out,
+    bench: newBench,
     playCount,
     benchCount,
     round: s.round + 1,

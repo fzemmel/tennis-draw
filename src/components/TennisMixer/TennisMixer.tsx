@@ -195,7 +195,7 @@ export function TennisMixer({
       </div>
 
       <div className="mb-4">
-        <BenchDisplay player={state.bench} language={language} />
+        <BenchDisplay players={state.bench} language={language} />
       </div>
 
       <Button
