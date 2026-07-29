@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Changelog contribution policy in `AGENTS.md`: requirement to update `CHANGELOG.md` for every notable change, guidance on `[Unreleased]` categories, release process, and omission rules
+- Pull-request template (`.github/PULL_REQUEST_TEMPLATE.md`) with a changelog update checkbox
+
 ## [0.2.0] – 2026-07-28
 
 ### Added
