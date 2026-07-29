@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] – 2026-07-29
+
 ### Added
-- Support for variable player counts (6, 7, or more players): `GameState.bench` is now a `string[]` FIFO queue; the Splashscreen accepts any selection of 5 or more players; the bench display shows all waiting players with the next-up player highlighted; with 6 players (2 bench) both bench players are substituted in simultaneously each round
+- Support for variable player counts (6, 7, or more players): `GameState.bench` is now a `string[]` FIFO queue; the Splashscreen accepts any selection of 5 or more players; the bench display shows all waiting players with the next-up player highlighted; with multiple bench players all are substituted in simultaneously each round
 - Changelog contribution policy in `AGENTS.md`: requirement to update `CHANGELOG.md` for every notable change, guidance on `[Unreleased]` categories, release process, and omission rules
 - Pull-request template (`.github/PULL_REQUEST_TEMPLATE.md`) with a changelog update checkbox
 - German and English UI localization with a device-local language selector, accessible language metadata, localized PWA install details, and deterministic Storybook locale coverage
@@ -17,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Contribution policy requiring Storybook updates in the same pull request as UI changes
 - Root-level `CLAUDE.md` that imports `AGENTS.md` so Claude Code uses the canonical repository guidance without duplicating shared instructions
 - Vercel Web Analytics integration for privacy-conscious Production and Preview page-view reporting
+- Updated PWA icons (192 px, 512 px) and replaced SVG favicon with PNG
 
 ## [0.2.0] – 2026-07-28
 
@@ -39,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vitest test suite (38 tests) for `tennis.ts` and `storage.ts` with jsdom environment and v8 coverage
 - ESLint flat config (`eslint.config.js`) with TypeScript, React Hooks, and React Refresh rules
 
-[Unreleased]: https://github.com/fzemmel/tennis-draw/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/fzemmel/tennis-draw/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/fzemmel/tennis-draw/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/fzemmel/tennis-draw/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/fzemmel/tennis-draw/releases/tag/v0.1.0
