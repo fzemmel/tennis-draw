@@ -141,6 +141,69 @@ Stories live in `src/stories/`. The Storybook framework is `@storybook/react-vit
 
 ---
 
+## Changelog Policy
+
+### When to update `CHANGELOG.md`
+
+Every pull request that introduces a **notable user-facing or developer-facing change** must include an update to `CHANGELOG.md` in the same pull request. This keeps the changelog a reliable summary of project changes.
+
+Examples of **notable changes** that require a changelog entry:
+- New features or UI additions
+- Bug fixes that affect observable behaviour
+- Breaking changes or removals
+- Dependency upgrades with behavioural impact
+- New scripts, commands, or developer workflows
+- Security fixes
+
+**Exceptions** — a changelog entry may be omitted when the change has no relevant behavioural impact, for example:
+- Formatting or whitespace-only edits
+- Typo fixes in code comments
+- Internal refactoring with no externally visible effect
+
+When no changelog entry is needed, the pull request description must explicitly state this and briefly explain why.
+
+### Writing entries
+
+Add unreleased entries under the `## [Unreleased]` section at the top of `CHANGELOG.md`, using the appropriate [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) category:
+
+| Category | When to use |
+|---|---|
+| `Added` | New feature or capability |
+| `Changed` | Change to existing behaviour |
+| `Deprecated` | Feature marked for future removal |
+| `Removed` | Feature or file removed |
+| `Fixed` | Bug fix |
+| `Security` | Vulnerability fix |
+
+Write entries **from the perspective of users or maintainers** — describe the resulting behaviour, not implementation details. Keep all text in **English**.
+
+```markdown
+## [Unreleased]
+
+### Added
+- New X feature that allows users to do Y
+
+### Fixed
+- Z no longer crashes when the player list is empty
+```
+
+### Release process
+
+When publishing a new version:
+
+1. Move all relevant `[Unreleased]` entries into a new versioned section directly below `[Unreleased]`, following the format `## [X.Y.Z] – YYYY-MM-DD`.
+2. Leave an empty `## [Unreleased]` section at the top for future changes.
+3. Add a comparison link at the bottom of the file:
+   ```
+   [X.Y.Z]: https://github.com/fzemmel/tennis-draw/compare/vA.B.C...vX.Y.Z
+   ```
+4. Update the `[Unreleased]` link to point to the new version:
+   ```
+   [Unreleased]: https://github.com/fzemmel/tennis-draw/compare/vX.Y.Z...HEAD
+   ```
+
+---
+
 ## Testing & TDD
 
 Tests live in `src/lib/__tests__/`. Framework: **Vitest** with a jsdom environment.
