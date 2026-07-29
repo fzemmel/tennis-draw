@@ -1,7 +1,17 @@
 import type { Preview } from "@storybook/react-vite";
+import { DEFAULT_LANGUAGE, isLanguage } from "../src/lib/i18n";
 import "../src/index.css";
 
 const preview: Preview = {
+  decorators: [
+    (Story, context) => {
+      const locale = isLanguage(context.globals.locale)
+        ? context.globals.locale
+        : DEFAULT_LANGUAGE;
+      document.documentElement.lang = locale;
+      return <Story />;
+    },
+  ],
   globalTypes: {
     locale: {
       name: "Locale",

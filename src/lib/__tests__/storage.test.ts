@@ -254,6 +254,14 @@ describe("loadLanguage", () => {
     const { loadLanguage } = await import("../storage");
     expect(loadLanguage()).toBe("de");
   });
+
+  it("returns to German when the stored preference is removed", async () => {
+    const { loadLanguage, saveLanguage } = await import("../storage");
+    saveLanguage("en");
+    localStorage.removeItem(LANGUAGE_KEY);
+
+    expect(loadLanguage()).toBe("de");
+  });
 });
 
 describe("saveLanguage", () => {

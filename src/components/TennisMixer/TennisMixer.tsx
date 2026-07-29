@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RefreshCw, RotateCcw, BarChart3, ChevronDown, ChevronUp } from "lucide-react";
-import { getTranslations } from "../../lib/i18n";
-import { initState, computeNext, serverFor } from "../../lib/tennis";
+import { getTranslations, type Language } from "../../lib/i18n";
+import { initState, computeNext, PLAYERS, serverFor } from "../../lib/tennis";
 import { loadState, saveState, pollSharedState, loadPlayerPool, savePlayerPool, clearState, loadLanguage, saveLanguage } from "../../lib/storage";
 import type { GameState, SyncMode } from "../../lib/types";
 import { Button } from "../ui/Button";
@@ -14,17 +14,34 @@ import { PartnerMatrix } from "./PartnerMatrix";
 import { Splashscreen } from "./Splashscreen";
 import { LanguageSelector } from "./LanguageSelector";
 
-export function TennisMixer() {
-  const [state, setState] = useState<GameState | null>(null);
-  const [playerPool, setPlayerPool] = useState<string[]>([]);
+interface TennisMixerProps {
+  initialState?: GameState | null;
+  initialPlayerPool?: string[];
+  initialLanguage?: Language;
+}
+
+export function TennisMixer({
+  initialState,
+  initialPlayerPool = [...PLAYERS],
+  initialLanguage,
+}: TennisMixerProps = {}) {
+  const hasInitialState = initialState !== undefined;
+  const [state, setState] = useState<GameState | null>(initialState ?? null);
+  const [playerPool, setPlayerPool] = useState<string[]>(
+    hasInitialState ? initialPlayerPool : [],
+  );
   const [syncMode, setSyncMode] = useState<SyncMode>("local");
-  const [language, setLanguage] = useState(() => loadLanguage());
-  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState(
+    () => initialLanguage ?? loadLanguage(),
+  );
+  const [loading, setLoading] = useState(!hasInitialState);
   const [showStats, setShowStats] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const t = getTranslations(language);
 
   useEffect(() => {
+    if (hasInitialState) return;
+
     let cancelled = false;
     (async () => {
       const pool = loadPlayerPool();
@@ -40,7 +57,11 @@ export function TennisMixer() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [hasInitialState]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   useEffect(() => {
     if (syncMode !== "shared") return;

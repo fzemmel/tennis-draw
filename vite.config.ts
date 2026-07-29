@@ -16,9 +16,14 @@ export default defineConfig(() => {
         registerType: "autoUpdate",
         includeAssets: ["icons/**"],
         manifest: {
+          lang: "de",
           name: "Tennis-Mixer 🎾",
           short_name: "Tennis-Mixer",
           description: "Intelligenter Aufstellungs-Mixer für Tennis-Doppel mit 5 Spielern",
+          description_localized: {
+            de: "Intelligenter Aufstellungs-Mixer für Tennis-Doppel mit 5 Spielern",
+            en: "Smart lineup mixer for five-player doubles tennis",
+          },
           theme_color: "#0f172a",
           background_color: "#0f172a",
           display: "standalone",

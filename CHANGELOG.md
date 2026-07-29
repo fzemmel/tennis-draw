@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Changelog contribution policy in `AGENTS.md`: requirement to update `CHANGELOG.md` for every notable change, guidance on `[Unreleased]` categories, release process, and omission rules
 - Pull-request template (`.github/PULL_REQUEST_TEMPLATE.md`) with a changelog update checkbox
-- German and English UI localization with a device-local language selector, default German startup language, and Storybook locale coverage
+- German and English UI localization with a device-local language selector, accessible language metadata, localized PWA install details, and deterministic Storybook locale coverage
+- CI validation for Storybook builds
 
 ## [0.2.0] – 2026-07-28
 

@@ -129,7 +129,8 @@ export function loadLanguage(): Language {
   try {
     const raw = localStorage.getItem(LANGUAGE_KEY);
     if (raw === null) {
-      return LANGUAGE_MEM.current;
+      LANGUAGE_MEM.current = DEFAULT_LANGUAGE;
+      return DEFAULT_LANGUAGE;
     }
     if (isLanguage(raw)) {
       LANGUAGE_MEM.current = raw;

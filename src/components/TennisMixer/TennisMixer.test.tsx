@@ -81,6 +81,7 @@ beforeEach(() => {
     globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true;
   localStorage.clear();
+  document.documentElement.lang = "de";
   document.body.innerHTML = "";
 });
 
@@ -97,6 +98,7 @@ describe("TennisMixer localization", () => {
     expect(getText(container)).toContain("Spiel starten");
     expect(getText(container)).not.toContain("Who is playing today?");
     expect(localStorage.getItem(LANGUAGE_KEY)).toBeNull();
+    expect(document.documentElement.lang).toBe("de");
 
     await click(getButtonByText(container, "Spiel starten"));
 
@@ -119,30 +121,45 @@ describe("TennisMixer localization", () => {
     expect(getText(view.container)).toContain("Start game");
     expect(getText(view.container)).not.toContain("Wer spielt heute?");
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe("en");
+    expect(document.documentElement.lang).toBe("en");
+
+    await click(getButtonByText(view.container, "Teja"));
+    expect(getText(view.container)).toContain("1 more player needed.");
+    await click(getButtonByText(view.container, "Teja"));
 
     await click(getButtonByText(view.container, "Start game"));
 
     expect(getText(view.container)).toContain("Game 1");
     expect(getText(view.container)).toContain("Next change");
     expect(getText(view.container)).toContain("BENCH");
+    expect(getText(view.container)).toContain("Local only");
     expect(getText(view.container)).not.toContain("Spiel 1");
     expect(getText(view.container)).not.toContain("Nächster Wechsel");
     expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
 
-    await click(getButtonByLabel(view.container, "Switch language to German"));
+    await click(getButtonByText(view.container, "Statistics"));
+    expect(getText(view.container)).toContain("Games, benches & serves");
+    expect(getText(view.container)).toContain("Times paired on the same team");
 
-    expect(getText(view.container)).toContain("Spiel 1");
-    expect(getText(view.container)).toContain("Nächster Wechsel");
-    expect(getText(view.container)).not.toContain("Game 1");
-    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("de");
+    await click(getButtonByText(view.container, "Next change"));
+    expect(getText(view.container)).toContain("comes in for");
 
     await unmount(view.root);
 
     view = await renderMixer();
 
-    expect(getText(view.container)).toContain("Spiel 1");
+    expect(getText(view.container)).toContain("Game 2");
+    expect(getText(view.container)).toContain("Next change");
+    expect(getText(view.container)).not.toContain("Spiel 2");
+    expect(document.documentElement.lang).toBe("en");
+
+    await click(getButtonByLabel(view.container, "Switch language to German"));
+
+    expect(getText(view.container)).toContain("Spiel 2");
     expect(getText(view.container)).toContain("Nächster Wechsel");
-    expect(getText(view.container)).not.toContain("Game 1");
+    expect(getText(view.container)).not.toContain("Game 2");
+    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("de");
+    expect(document.documentElement.lang).toBe("de");
 
     await unmount(view.root);
   });
