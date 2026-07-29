@@ -47,7 +47,7 @@ Defines all shared types. `GameState` is the single source of truth. Never add c
 ### `src/lib/tennis.ts`
 - `PLAYERS` — the **hardcoded** array of player names. This is intentional; the app is built for a fixed group.
 - `initState(players)` — assigns the first 4 players to court, the rest to the `bench` array (FIFO queue); initialises all counters for every player.
-- `computeNext(state)` — computes the optimal next swap **without mutating** the input state. Returns a new `GameState`. The incoming player is always `state.bench[0]`; the outgoing player is chosen by the existing scoring function and appended to the end of the bench queue (`[...state.bench.slice(1), out]`). The scoring function: `score = partnerFresh * 3 + oppFresh + rand(0..0.5)`. Lower score = better swap.
+- `computeNext(state)` — computes the next round of substitutions **without mutating** the input state. Returns a new `GameState`. All bench players rotate in simultaneously (one swap per bench player per `computeNext` call). The incoming player for each swap is `bench[0]`; the outgoing player is chosen by the scoring function and appended to the bench queue. A `newlyIn` set tracks all players subbed in during the call so no player is subbed in and immediately subbed out again. The scoring function: `score = partnerFresh * 3 + oppFresh + rand(0..0.5)`. Lower score = better swap. `round` increments once per `computeNext` call regardless of bench size.
 - `serverFor(round, home, guest)` — pure serve-order calculation following doubles rotation rules.
 
 ### `src/lib/storage.ts`

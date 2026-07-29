@@ -376,4 +376,15 @@ describe("computeNext — 7 players FIFO rotation", () => {
     const counts = SEVEN.map((p) => state.benchCount[p]);
     expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
   });
+
+  it("no player is subbed in and immediately subbed out in the same round", () => {
+    let state = initState(SEVEN);
+    for (let i = 0; i < 20; i++) {
+      const inPlayers = new Set(state.bench);
+      state = computeNext(state);
+      const outPlayers = new Set(state.lastChanges.map((c) => c.out));
+      // No player who was on bench (and came in) should also appear as out
+      inPlayers.forEach((p) => expect(outPlayers.has(p)).toBe(false));
+    }
+  });
 });

@@ -24,7 +24,6 @@ interface Translations {
     label: string;
     badge: string;
     nextUp: string;
-    waiting: string;
   };
   teamCard: {
     newBadge: string;
@@ -83,7 +82,6 @@ const translations: Record<Language, Translations> = {
       label: "PAUSE ☕",
       badge: "BANK",
       nextUp: "Nächster",
-      waiting: "Wartet",
     },
     teamCard: {
       newBadge: "NEU",
@@ -145,7 +143,6 @@ const translations: Record<Language, Translations> = {
       label: "BENCH ☕",
       badge: "BENCH",
       nextUp: "Next up",
-      waiting: "Waiting",
     },
     teamCard: {
       newBadge: "NEW",

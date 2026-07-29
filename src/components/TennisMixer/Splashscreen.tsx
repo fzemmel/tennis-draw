@@ -169,7 +169,7 @@ export function Splashscreen({
           ) : (
             <div className="flex flex-col gap-1.5">
               {selected.map((name, index) => {
-              const isBench = index >= 4 && selected.length >= 5;
+                const isBench = index >= 4;
                 const isDragging = dragIndex === index;
                 return (
                   <div

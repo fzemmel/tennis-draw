@@ -98,13 +98,18 @@ export function initState(players: readonly string[]): GameState {
   };
 }
 
-/** Performs a single substitution (bench[0] in, one court player out) without touching round or serve. */
+/** Performs a single substitution (bench[0] in, one court player out) without touching round or serve.
+ *  newlyIn contains all players already subbed in during the current computeNext call; they are
+ *  excluded from outgoing candidates so no player is subbed in and out in the same round. */
 function performSingleSub(
   s: GameState,
+  newlyIn: ReadonlySet<string>,
 ): { state: GameState; change: ChangeEvent } {
   const incoming = s.bench[0];
   const court = [...s.home, ...s.guest];
-  let candidates = court.filter((p) => p !== s.lastIn);
+  // Exclude the previous lastIn AND everyone who came in earlier this round
+  let candidates = court.filter((p) => p !== s.lastIn && !newlyIn.has(p));
+  if (candidates.length === 0) candidates = court.filter((p) => !newlyIn.has(p));
   if (candidates.length === 0) candidates = court;
 
   const minBench = Math.min(...candidates.map((p) => s.benchCount[p] || 0));
@@ -170,17 +175,19 @@ function performSingleSub(
   return { state: ns, change };
 }
 
-/** Berechnet den nächsten optimalen Wechsel, ohne den State zu mutieren.
- *  Mit mehreren Bankspielern (≥ 2) werden alle gleichzeitig eingewechselt. */
+/** Computes the next optimal substitution without mutating the input state.
+ *  With multiple bench players (≥ 2) all bench players rotate in simultaneously per round. */
 export function computeNext(s: GameState): GameState {
   const swapCount = s.bench.length;
   const changes: ChangeEvent[] = [];
+  const newlyIn = new Set<string>(); // all players subbed in during this call
 
   // Chain single swaps — one per bench player
   let cur = s;
   for (let i = 0; i < swapCount; i++) {
-    const { state, change } = performSingleSub(cur);
+    const { state, change } = performSingleSub(cur, newlyIn);
     changes.push(change);
+    newlyIn.add(change.in);
     cur = state;
   }
 

@@ -76,6 +76,22 @@ describe("loadState", () => {
     expect(result.mode).toBe("local");
     expect(result.state?.round).toBe(3);
   });
+
+  it("migrates old bench: string to bench: string[]", async () => {
+    const oldState = { ...makeState(), bench: "E" };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(oldState));
+    const { loadState } = await import("../storage");
+    const result = await loadState();
+    expect(result.state?.bench).toEqual(["E"]);
+  });
+
+  it("migrates missing lastChanges to empty array", async () => {
+    const oldState = { ...makeState(), lastChanges: undefined, lastChange: null };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(oldState));
+    const { loadState } = await import("../storage");
+    const result = await loadState();
+    expect(result.state?.lastChanges).toEqual([]);
+  });
 });
 
 // ---------------------------------------------------------------------------
