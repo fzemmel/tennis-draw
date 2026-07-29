@@ -2,12 +2,25 @@ import type { Preview } from "@storybook/react-vite";
 import "../src/index.css";
 
 const preview: Preview = {
+  globalTypes: {
+    locale: {
+      name: "Locale",
+      description: "UI language",
+      toolbar: {
+        icon: "globe",
+        items: [
+          { value: "de", title: "German" },
+          { value: "en", title: "English" },
+        ],
+      },
+    },
+  },
   parameters: {
     backgrounds: {
       options: {
         dark: { name: "dark", value: "#0f172a" },
-        light: { name: "light", value: "#f8fafc" }
-      }
+        light: { name: "light", value: "#f8fafc" },
+      },
     },
     controls: {
       matchers: {
@@ -19,9 +32,10 @@ const preview: Preview = {
 
   initialGlobals: {
     backgrounds: {
-      value: "dark"
-    }
-  }
+      value: "dark",
+    },
+    locale: "de",
+  },
 };
 
 export default preview;

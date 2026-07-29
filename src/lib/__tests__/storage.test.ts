@@ -23,6 +23,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
 }
 
 const STORAGE_KEY = "tennis_state_v1";
+const LANGUAGE_KEY = "tennis_language_v1";
 
 // ---------------------------------------------------------------------------
 // loadState
@@ -227,6 +228,46 @@ describe("savePlayerPool", () => {
     const { savePlayerPool, loadPlayerPool } = await import("../storage");
     savePlayerPool(pool);
     expect(loadPlayerPool()).toEqual(pool);
+  });
+});
+
+describe("loadLanguage", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("defaults to German when nothing is stored", async () => {
+    const { loadLanguage } = await import("../storage");
+    expect(loadLanguage()).toBe("de");
+  });
+
+  it("restores a stored language", async () => {
+    localStorage.setItem(LANGUAGE_KEY, "en");
+    const { loadLanguage } = await import("../storage");
+    expect(loadLanguage()).toBe("en");
+  });
+
+  it("falls back to German for invalid stored language values", async () => {
+    localStorage.setItem(LANGUAGE_KEY, "fr");
+    const { loadLanguage } = await import("../storage");
+    expect(loadLanguage()).toBe("de");
+  });
+});
+
+describe("saveLanguage", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("persists the selected language", async () => {
+    const { saveLanguage, loadLanguage } = await import("../storage");
+    saveLanguage("en");
+    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("en");
+    expect(loadLanguage()).toBe("en");
   });
 });
 

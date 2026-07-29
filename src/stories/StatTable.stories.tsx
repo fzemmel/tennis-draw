@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatTable } from "../components/TennisMixer/StatTable";
+import type { Language } from "../lib/i18n";
 
 const meta: Meta<typeof StatTable> = {
   title: "TennisMixer/StatTable",
@@ -8,11 +9,17 @@ const meta: Meta<typeof StatTable> = {
   parameters: { layout: "centered" },
   decorators: [
     (Story) => (
-      <div className="bg-slate-800 rounded-xl p-4" style={{ width: 360 }}>
+      <div className="bg-slate-800 rounded-xl p-4 w-[360px]">
         <Story />
       </div>
     ),
   ],
+  render: (args, context) => (
+    <StatTable
+      {...args}
+      language={context.globals.locale as Language}
+    />
+  ),
 };
 
 export default meta;
