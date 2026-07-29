@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatTable } from "../components/TennisMixer/StatTable";
-import type { Language } from "../lib/i18n";
+import { storyLanguage } from "./storybook";
 
 const meta: Meta<typeof StatTable> = {
   title: "TennisMixer/StatTable",
@@ -17,7 +17,7 @@ const meta: Meta<typeof StatTable> = {
   render: (args, context) => (
     <StatTable
       {...args}
-      language={context.globals.locale as Language}
+      language={storyLanguage(context.globals.locale)}
     />
   ),
 };

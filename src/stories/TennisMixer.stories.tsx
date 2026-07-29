@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TennisMixer } from "../components/TennisMixer/TennisMixer";
-import { DEFAULT_LANGUAGE, isLanguage, type Language } from "../lib/i18n";
 import { PLAYERS } from "../lib/tennis";
 import type { GameState } from "../lib/types";
+import { storyLanguage } from "./storybook";
 
 const meta: Meta<typeof TennisMixer> = {
   title: "TennisMixer/TennisMixer",
@@ -36,10 +36,6 @@ function makeState(): GameState {
     lastChange: null,
     ts: 1000,
   };
-}
-
-function storyLanguage(value: unknown): Language {
-  return isLanguage(value) ? value : DEFAULT_LANGUAGE;
 }
 
 export const Splash: Story = {

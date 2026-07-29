@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TeamCard } from "../components/TennisMixer/TeamCard";
-import type { Language } from "../lib/i18n";
+import { storyLanguage } from "./storybook";
 
 const meta: Meta<typeof TeamCard> = {
   title: "TennisMixer/TeamCard",
@@ -17,7 +17,7 @@ const meta: Meta<typeof TeamCard> = {
   render: (args, context) => (
     <TeamCard
       {...args}
-      language={context.globals.locale as Language}
+      language={storyLanguage(context.globals.locale)}
     />
   ),
 };

@@ -108,7 +108,7 @@ Two GitHub Actions workflows live in `.github/workflows/`:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `ci.yml` | push / PR → `main` | Lint (`npm run lint`) + Test (`npm test`) |
+| `ci.yml` | push / PR → `main` | Lint + Test + Storybook build |
 | `deploy.yml` | push / PR → `main` | Lint + Test, then deploy to **Vercel** |
 
 **deploy.yml jobs:**
@@ -138,6 +138,18 @@ Icons are expected at `public/icons/icon-192.png` and `public/icons/icon-512.png
 
 ### Storybook
 Stories live in `src/stories/`. The Storybook framework is `@storybook/react-vite`. All Storybook packages must stay at the **same major version** as the `storybook` core package.
+
+Every pull request that adds, changes, renames, or removes a UI component or visible UI state must update the corresponding Storybook stories in the same pull request.
+
+**Story requirements:**
+- Every component under `src/components/ui/` and `src/components/TennisMixer/` must have a direct story unless composed coverage is explicitly justified in the pull request.
+- Cover representative states and variants rather than only the default state.
+- Localized components must respond to the global German/English locale toolbar.
+- Stories must be deterministic and independent of persisted browser state such as `localStorage`.
+- Use `fn()` spies and `play` functions from `storybook/test` for meaningful interactions and callbacks.
+- Keep story exports, titles, descriptions, and fixture metadata in English.
+
+Run `npm run build-storybook` after changing UI or stories. CI runs this command and must pass before merge.
 
 ---
 

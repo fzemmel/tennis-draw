@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pull-request template (`.github/PULL_REQUEST_TEMPLATE.md`) with a changelog update checkbox
 - German and English UI localization with a device-local language selector, accessible language metadata, localized PWA install details, and deterministic Storybook locale coverage
 - CI validation for Storybook builds
+- Complete Storybook coverage for every UI component, including representative splash-screen, synchronization, statistics, and language-selection states
+- Contribution policy requiring Storybook updates in the same pull request as UI changes
 
 ## [0.2.0] – 2026-07-28
 
