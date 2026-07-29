@@ -50,7 +50,7 @@ npm run preview
 
 ### Storybook
 
-Component stories for `Button`, `TeamCard`, `StatTable`, and the full `TennisMixer` view:
+Storybook covers every UI component and the complete splash-screen and active-game flows. Use the locale toolbar to review all localized stories in German and English.
 
 ```bash
 npm run storybook        # dev server on http://localhost:6006
@@ -76,6 +76,7 @@ The app auto-detects which mode is available on startup. In shared mode, state i
 src/
 ├── lib/
 │   ├── types.ts        # TypeScript interfaces (GameState, ChangeEvent, …)
+│   ├── i18n.ts         # German and English UI translations
 │   ├── tennis.ts       # Core logic: initState, computeNext, serverFor
 │   └── storage.ts      # Persistence: loadState, saveState, pollSharedState
 ├── components/
@@ -83,13 +84,15 @@ src/
 │   │   └── Button.tsx  # Reusable button primitive
 │   └── TennisMixer/
 │       ├── TennisMixer.tsx   # Root component / orchestrator
+│       ├── Splashscreen.tsx   # Player selection and initial lineup
+│       ├── LanguageSelector.tsx # German/English language control
 │       ├── TeamCard.tsx      # Displays one team of two players
 │       ├── BenchDisplay.tsx  # Shows the benched player
 │       ├── ChangeNotice.tsx  # Swap notification banner
 │       ├── SyncBadge.tsx     # Sync mode indicator
 │       ├── StatTable.tsx     # Play/bench/serve stats
 │       └── PartnerMatrix.tsx # Partner history grid
-├── stories/            # Storybook stories
+├── stories/            # Direct component and full-flow Storybook stories
 ├── App.tsx
 └── main.tsx
 ```
