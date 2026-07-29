@@ -1,16 +1,14 @@
+import { DEFAULT_LANGUAGE, isLanguage, type Language } from "./i18n";
 import type { GameState, SyncMode } from "./types";
 import { PLAYERS } from "./tennis";
 
 const STORAGE_KEY = "tennis_state_v1";
 const POOL_KEY = "tennis_pool_v1";
+const LANGUAGE_KEY = "tennis_language_v1";
 
-/** In-Memory-Fallback für Vorschau-Umgebungen ohne localStorage. */
 const MEM: { current: GameState | null } = { current: null };
+const LANGUAGE_MEM: { current: Language } = { current: DEFAULT_LANGUAGE };
 
-/**
- * Optionale geteilte Storage-API (z. B. Glitch / Replit).
- * Wird im normalen PWA-Betrieb nicht genutzt.
- */
 declare global {
   interface Window {
     storage?: {
@@ -34,11 +32,10 @@ export async function loadState(): Promise<{
         return { state, mode: "shared" };
       }
     } catch {
-      // Schlüssel fehlt oder Storage nicht erreichbar
+      // Key missing or shared storage unavailable.
     }
   }
 
-  // Lokaler localStorage-Fallback
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -46,7 +43,7 @@ export async function loadState(): Promise<{
       return { state, mode: "local" };
     }
   } catch {
-    // Kein localStorage (z. B. Private Mode mit Einschränkungen)
+    // localStorage unavailable (for example restricted browser modes).
   }
 
   return { state: MEM.current, mode: "local" };
@@ -64,14 +61,14 @@ export async function saveState(
       await window.storage.set(STORAGE_KEY, serialised, true);
       return;
     } catch {
-      // Fallback auf localStorage
+      // Fall back to localStorage.
     }
   }
 
   try {
     localStorage.setItem(STORAGE_KEY, serialised);
   } catch {
-    // Ignorieren – In-Memory-Fallback ist bereits gesetzt
+    // Ignore: the in-memory fallback is already set.
   }
 }
 
@@ -81,7 +78,7 @@ export async function pollSharedState(): Promise<GameState | null> {
     const r = await window.storage.get(STORAGE_KEY, true);
     if (r?.value) return JSON.parse(r.value) as GameState;
   } catch {
-    // Ignorieren
+    // Ignore shared polling failures.
   }
   return null;
 }
@@ -99,7 +96,7 @@ export function loadPlayerPool(): string[] {
       }
     }
   } catch {
-    // Fall through to default
+    // Fall through to the default pool.
   }
   return [...PLAYERS];
 }
@@ -124,6 +121,37 @@ export function savePlayerPool(pool: string[]): void {
   try {
     localStorage.setItem(POOL_KEY, JSON.stringify(pool));
   } catch {
-    // Ignore — pool is non-critical, game can restart with defaults
+    // Ignore: the pool is non-critical and can fall back to defaults.
+  }
+}
+
+export function loadLanguage(): Language {
+  try {
+    const raw = localStorage.getItem(LANGUAGE_KEY);
+    if (raw === null) {
+      LANGUAGE_MEM.current = DEFAULT_LANGUAGE;
+      return DEFAULT_LANGUAGE;
+    }
+    if (isLanguage(raw)) {
+      LANGUAGE_MEM.current = raw;
+      return raw;
+    }
+
+    LANGUAGE_MEM.current = DEFAULT_LANGUAGE;
+    return DEFAULT_LANGUAGE;
+  } catch {
+    // localStorage unavailable, fall back to the in-memory value.
+  }
+
+  return LANGUAGE_MEM.current;
+}
+
+export function saveLanguage(language: Language): void {
+  LANGUAGE_MEM.current = language;
+
+  try {
+    localStorage.setItem(LANGUAGE_KEY, language);
+  } catch {
+    // Ignore: the in-memory fallback is already set.
   }
 }

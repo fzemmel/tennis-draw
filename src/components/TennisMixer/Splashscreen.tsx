@@ -1,19 +1,30 @@
 import { useState, useRef } from "react";
 import { GripVertical, Plus, X } from "lucide-react";
+import { getTranslations, type Language } from "../../lib/i18n";
 import { Button } from "../ui/Button";
 import { PLAYERS } from "../../lib/tennis";
+import { LanguageSelector } from "./LanguageSelector";
 
 interface SplashscreenProps {
   pool: string[];
   onStart: (orderedPlayers: string[]) => void;
   onPoolChange: (pool: string[]) => void;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
 }
 
-export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps) {
+export function Splashscreen({
+  pool,
+  onStart,
+  onPoolChange,
+  language,
+  onLanguageChange,
+}: SplashscreenProps) {
   const [selected, setSelected] = useState<string[]>(pool.slice(0, 5));
   const [customInput, setCustomInput] = useState("");
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const dragOverIndex = useRef<number | null>(null);
+  const t = getTranslations(language);
 
   function togglePlayer(name: string) {
     setSelected((prev) => {
@@ -37,7 +48,6 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
     setSelected((prev) => prev.filter((p) => p !== name));
   }
 
-  // --- drag & drop reorder ---
   function handleDragStart(index: number) {
     setDragIndex(index);
   }
@@ -64,24 +74,27 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
   }
 
   const canStart = selected.length === 5;
-
-  // Players in the pool that are not default (custom)
   const customPlayers = pool.filter((p) => !PLAYERS.includes(p));
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center px-4 py-8">
       <div className="w-full max-w-sm flex flex-col gap-6">
-        {/* Header */}
-        <div className="text-center">
-          <div className="text-4xl mb-2">🎾</div>
-          <h1 className="text-2xl font-bold text-slate-50">Tennis-Mixer</h1>
-          <p className="text-slate-400 text-sm mt-1">Who is playing today?</p>
+        <div className="flex justify-end">
+          <LanguageSelector
+            language={language}
+            onChange={onLanguageChange}
+          />
         </div>
 
-        {/* Player pool */}
+        <div className="text-center">
+          <div className="text-4xl mb-2">🎾</div>
+          <h1 className="text-2xl font-bold text-slate-50">{t.appName}</h1>
+          <p className="text-slate-400 text-sm mt-1">{t.splash.title}</p>
+        </div>
+
         <div>
           <div className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-2">
-            Select players
+            {t.splash.selectPlayers}
           </div>
           <div className="flex flex-wrap gap-2">
             {pool.map((name) => {
@@ -104,7 +117,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
                     <button
                       onClick={() => removeFromPool(name)}
                       className="absolute -top-1.5 -right-1.5 hidden group-hover:flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white"
-                      aria-label={`Remove ${name}`}
+                      aria-label={t.splash.removePlayer(name)}
                     >
                       <X size={10} />
                     </button>
@@ -113,15 +126,13 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
               );
             })}
           </div>
-
-          {/* Add custom player */}
           <div className="flex gap-2 mt-3">
             <input
               type="text"
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addCustomPlayer()}
-              placeholder="Add player…"
+              placeholder={t.splash.addPlayerPlaceholder}
               maxLength={20}
               className="flex-1 bg-slate-800 border border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-slate-400"
             />
@@ -129,18 +140,17 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
               size="sm"
               onClick={addCustomPlayer}
               disabled={!customInput.trim() || pool.includes(customInput.trim())}
-              aria-label="Add player"
+              aria-label={t.splash.addPlayer}
             >
               <Plus size={16} />
             </Button>
           </div>
         </div>
 
-        {/* Ordered lineup */}
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <div className="text-xs font-bold tracking-widest text-slate-400 uppercase">
-              Lineup
+              {t.splash.lineup}
             </div>
             <div
               className={[
@@ -148,13 +158,13 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
                 canStart ? "text-green-400" : "text-yellow-400",
               ].join(" ")}
             >
-              {selected.length}/5 selected
+              {t.splash.selectedCount(selected.length)}
             </div>
           </div>
 
           {selected.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-4">
-              Select 5 players above.
+              {t.splash.emptySelection}
             </p>
           ) : (
             <div className="flex flex-col gap-1.5">
@@ -181,7 +191,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
                     </span>
                     {isBench && (
                       <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 rounded-md px-1.5 py-0.5 tracking-wide">
-                        BANK
+                        {t.bench.badge}
                       </span>
                     )}
                   </div>
@@ -192,17 +202,16 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
 
           {selected.length > 5 && (
             <p className="text-yellow-400 text-xs mt-2 text-center">
-              Please select exactly 5 players ({selected.length} selected).
+              {t.splash.exactFive(selected.length)}
             </p>
           )}
           {selected.length < 5 && selected.length > 0 && (
             <p className="text-yellow-400 text-xs mt-2 text-center">
-              {5 - selected.length} more player{5 - selected.length === 1 ? "" : "s"} needed.
+              {t.splash.moreNeeded(5 - selected.length)}
             </p>
           )}
         </div>
 
-        {/* Start button */}
         <Button
           variant="primary"
           size="lg"
@@ -210,7 +219,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
           disabled={!canStart}
           onClick={() => canStart && onStart(selected)}
         >
-          Start game →
+          {t.splash.start}
         </Button>
       </div>
     </div>

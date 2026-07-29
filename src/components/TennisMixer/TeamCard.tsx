@@ -1,8 +1,11 @@
+import { getTranslations, type Language } from "../../lib/i18n";
+
 interface TeamCardProps {
   title: "HEIM" | "GAST";
   players: [string, string];
   serverName: string;
   incomingName?: string | null;
+  language: Language;
 }
 
 const borderColor: Record<TeamCardProps["title"], string> = {
@@ -20,7 +23,10 @@ export function TeamCard({
   players,
   serverName,
   incomingName,
+  language,
 }: TeamCardProps) {
+  const t = getTranslations(language);
+
   return (
     <div
       className={[
@@ -34,7 +40,7 @@ export function TeamCard({
           titleColor[title],
         ].join(" ")}
       >
-        {title}
+        {t.teamLabel[title]}
       </div>
 
       {players.map((player) => {
@@ -62,7 +68,7 @@ export function TeamCard({
                   isServer ? "bg-slate-900" : "bg-green-500",
                 ].join(" ")}
               >
-                NEU
+                {t.teamCard.newBadge}
               </span>
             )}
           </div>

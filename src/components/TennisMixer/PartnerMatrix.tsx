@@ -1,14 +1,24 @@
+import { getTranslations, type Language } from "../../lib/i18n";
 import { pairKey } from "../../lib/tennis";
 
 interface PartnerMatrixProps {
   players: readonly string[];
   partnerCount: Record<string, number>;
+  language: Language;
 }
 
-export function PartnerMatrix({ players, partnerCount }: PartnerMatrixProps) {
+export function PartnerMatrix({
+  players,
+  partnerCount,
+  language,
+}: PartnerMatrixProps) {
+  const t = getTranslations(language);
+
   return (
     <div>
-      <h3 className="text-sm font-semibold mb-2">Wie oft zusammen im Team</h3>
+      <h3 className="text-sm font-semibold mb-2">
+        {t.statsPanel.partnerMatrixTitle}
+      </h3>
       <div className="overflow-x-auto">
         <table className="text-xs border-collapse w-full">
           <thead>
@@ -52,8 +62,7 @@ export function PartnerMatrix({ players, partnerCount }: PartnerMatrixProps) {
         </table>
       </div>
       <p className="text-[11px] text-slate-500 mt-2">
-        Aufschlag rotiert nach Doppelregel reihum durch alle vier Plätze. Pausen
-        &amp; Auswechslungen sind über alle Spieler ausgeglichen.
+        {t.statsPanel.partnerMatrixFootnote}
       </p>
     </div>
   );

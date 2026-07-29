@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TennisMixer } from "../components/TennisMixer/TennisMixer";
+import { DEFAULT_LANGUAGE, isLanguage, type Language } from "../lib/i18n";
+import { PLAYERS } from "../lib/tennis";
+import type { GameState } from "../lib/types";
 
 const meta: Meta<typeof TennisMixer> = {
   title: "TennisMixer/TennisMixer",
@@ -13,4 +16,55 @@ const meta: Meta<typeof TennisMixer> = {
 export default meta;
 type Story = StoryObj<typeof TennisMixer>;
 
-export const Default: Story = {};
+function makeState(): GameState {
+  return {
+    home: ["Teja", "Nic"],
+    guest: ["Benni", "Alex"],
+    bench: "Andre",
+    playCount: { Teja: 1, Nic: 1, Benni: 1, Alex: 1, Andre: 0 },
+    benchCount: { Teja: 0, Nic: 0, Benni: 0, Alex: 0, Andre: 1 },
+    serveCount: { Teja: 1, Nic: 0, Benni: 0, Alex: 0, Andre: 0 },
+    partnerCount: { "Nic|Teja": 1, "Alex|Benni": 1 },
+    opponentCount: {
+      "Alex|Nic": 1,
+      "Alex|Teja": 1,
+      "Benni|Nic": 1,
+      "Benni|Teja": 1,
+    },
+    round: 1,
+    lastIn: null,
+    lastChange: null,
+    ts: 1000,
+  };
+}
+
+function storyLanguage(value: unknown): Language {
+  return isLanguage(value) ? value : DEFAULT_LANGUAGE;
+}
+
+export const Splash: Story = {
+  render: (_, context) => {
+    const language = storyLanguage(context.globals.locale);
+    return (
+      <TennisMixer
+        key={`splash-${language}`}
+        initialState={null}
+        initialPlayerPool={[...PLAYERS]}
+        initialLanguage={language}
+      />
+    );
+  },
+};
+
+export const ActiveGame: Story = {
+  render: (_, context) => {
+    const language = storyLanguage(context.globals.locale);
+    return (
+      <TennisMixer
+        key={`game-${language}`}
+        initialState={makeState()}
+        initialLanguage={language}
+      />
+    );
+  },
+};

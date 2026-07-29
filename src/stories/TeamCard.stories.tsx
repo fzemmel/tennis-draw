@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TeamCard } from "../components/TennisMixer/TeamCard";
+import type { Language } from "../lib/i18n";
 
 const meta: Meta<typeof TeamCard> = {
   title: "TennisMixer/TeamCard",
@@ -8,17 +9,23 @@ const meta: Meta<typeof TeamCard> = {
   parameters: { layout: "centered" },
   decorators: [
     (Story) => (
-      <div className="flex gap-4 p-4" style={{ width: 340 }}>
+      <div className="flex gap-4 p-4 w-[340px]">
         <Story />
       </div>
     ),
   ],
+  render: (args, context) => (
+    <TeamCard
+      {...args}
+      language={context.globals.locale as Language}
+    />
+  ),
 };
 
 export default meta;
 type Story = StoryObj<typeof TeamCard>;
 
-export const Heim: Story = {
+export const Home: Story = {
   args: {
     title: "HEIM",
     players: ["Fidschi", "Nic"],
@@ -27,7 +34,7 @@ export const Heim: Story = {
   },
 };
 
-export const Gast: Story = {
+export const Guest: Story = {
   args: {
     title: "GAST",
     players: ["Alex", "Benni"],
@@ -36,8 +43,8 @@ export const Gast: Story = {
   },
 };
 
-export const MitNeuemSpieler: Story = {
-  name: "Mit neuem Spieler (NEU-Badge)",
+export const WithIncomingPlayer: Story = {
+  name: "With incoming player badge",
   args: {
     title: "HEIM",
     players: ["Teja", "Nic"],
