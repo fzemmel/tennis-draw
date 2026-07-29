@@ -200,14 +200,14 @@ describe("computeNext", () => {
     expect(s2.benchCount[outPlayer]).toBe(s1.benchCount[outPlayer] + 1);
   });
 
-  it("lastChange contains the correct substitution information", () => {
+  it("lastChanges contains the correct substitution information", () => {
     const s1 = initState(FIVE);
     const incoming = s1.bench[0];
     const s2 = computeNext(s1);
-    expect(s2.lastChange).not.toBeNull();
-    expect(s2.lastChange!.in).toBe(incoming);
-    expect(s2.lastChange!.out).toBe(s2.bench[s2.bench.length - 1]);
-    expect(["HEIM", "GAST"]).toContain(s2.lastChange!.team);
+    expect(s2.lastChanges).toHaveLength(1);
+    expect(s2.lastChanges[0].in).toBe(incoming);
+    expect(s2.lastChanges[0].out).toBe(s2.bench[s2.bench.length - 1]);
+    expect(["HEIM", "GAST"]).toContain(s2.lastChanges[0].team);
   });
 
   it("partnerCount of the new team pair is updated after the substitution", () => {
@@ -299,22 +299,34 @@ describe("computeNext — 6 players FIFO rotation", () => {
     }
   });
 
-  it("incoming player is always bench[0] (FIFO order)", () => {
+  it("incoming players are bench[0] and bench[1] (both come in)", () => {
     let state = initState(SIX);
     for (let i = 0; i < 6; i++) {
-      const expectedIn = state.bench[0];
+      const expectedIn0 = state.bench[0];
+      const expectedIn1 = state.bench[1];
       state = computeNext(state);
-      expect(state.lastChange!.in).toBe(expectedIn);
+      const incomingNames = state.lastChanges.map((c) => c.in);
+      expect(incomingNames).toContain(expectedIn0);
+      expect(incomingNames).toContain(expectedIn1);
     }
   });
 
-  it("outgoing player is appended at end of bench queue", () => {
+  it("both bench players come in per round — lastChanges has 2 entries", () => {
+    let state = initState(SIX);
+    state = computeNext(state);
+    expect(state.lastChanges).toHaveLength(2);
+  });
+
+  it("outgoing players form the new bench", () => {
     let state = initState(SIX);
     for (let i = 0; i < 6; i++) {
-      const prevBenchTail = state.bench[1];
+      const prevBench = [...state.bench];
       state = computeNext(state);
-      // The second element of the previous bench is now bench[0]
-      expect(state.bench[0]).toBe(prevBenchTail);
+      // The outgoing players (from lastChanges) are now on bench
+      const outPlayers = state.lastChanges.map((c) => c.out);
+      outPlayers.forEach((p) => expect(state.bench).toContain(p));
+      // The former bench players are no longer on bench
+      prevBench.forEach((p) => expect(state.bench).not.toContain(p));
     }
   });
 
@@ -347,7 +359,7 @@ describe("computeNext — 7 players FIFO rotation", () => {
     for (let i = 0; i < 7; i++) {
       const expectedIn = state.bench[0];
       state = computeNext(state);
-      expect(state.lastChange!.in).toBe(expectedIn);
+      expect(state.lastChanges[0].in).toBe(expectedIn);
     }
   });
 

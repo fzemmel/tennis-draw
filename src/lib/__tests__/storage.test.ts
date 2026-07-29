@@ -16,7 +16,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
     opponentCount: { "A|C": 1, "A|D": 1, "B|C": 1, "B|D": 1 },
     round: 1,
     lastIn: null,
-    lastChange: null,
+    lastChanges: [],
     ts: 1000,
     ...overrides,
   };

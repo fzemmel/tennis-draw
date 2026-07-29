@@ -4,7 +4,7 @@ interface TeamCardProps {
   title: "HEIM" | "GAST";
   players: [string, string];
   serverName: string;
-  incomingName?: string | null;
+  incomingNames?: string[];
   language: Language;
 }
 
@@ -22,7 +22,7 @@ export function TeamCard({
   title,
   players,
   serverName,
-  incomingName,
+  incomingNames,
   language,
 }: TeamCardProps) {
   const t = getTranslations(language);
@@ -45,7 +45,7 @@ export function TeamCard({
 
       {players.map((player) => {
         const isServer = player === serverName;
-        const isNew = player === incomingName;
+        const isNew = incomingNames?.includes(player) ?? false;
 
         return (
           <div

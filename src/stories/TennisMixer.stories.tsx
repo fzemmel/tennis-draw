@@ -33,7 +33,7 @@ function makeState(): GameState {
     },
     round: 1,
     lastIn: null,
-    lastChange: null,
+    lastChanges: [],
     ts: 1000,
   };
 }
@@ -55,7 +55,7 @@ function makeState6Players(): GameState {
     },
     round: 1,
     lastIn: null,
-    lastChange: null,
+    lastChanges: [],
     ts: 1000,
   };
 }

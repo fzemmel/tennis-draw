@@ -136,7 +136,7 @@ export function TennisMixer({
 
   const players = Object.keys(state.playCount);
   const server = serverFor(state.round, state.home, state.guest);
-  const incomingName = state.lastChange?.in;
+  const incomingNames = state.lastChanges.map((c) => c.in);
 
   const statRows = players.map((p) => ({
     name: p,
@@ -162,9 +162,9 @@ export function TennisMixer({
         <SyncBadge mode={syncMode} language={language} />
       </div>
 
-      {state.lastChange && (
+      {state.lastChanges.length > 0 && (
         <div className="mb-3.5">
-          <ChangeNotice change={state.lastChange} language={language} />
+          <ChangeNotice changes={state.lastChanges} language={language} />
         </div>
       )}
 
@@ -173,7 +173,7 @@ export function TennisMixer({
           title="HEIM"
           players={state.home}
           serverName={server.name}
-          incomingName={incomingName}
+          incomingNames={incomingNames}
           language={language}
         />
         <div className="flex items-center font-extrabold text-lg text-slate-500">
@@ -183,7 +183,7 @@ export function TennisMixer({
           title="GAST"
           players={state.guest}
           serverName={server.name}
-          incomingName={incomingName}
+          incomingNames={incomingNames}
           language={language}
         />
       </div>

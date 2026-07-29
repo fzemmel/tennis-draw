@@ -11,7 +11,7 @@ export interface GameState {
   opponentCount: Record<string, number>;
   round: number;
   lastIn: string | null;
-  lastChange: ChangeEvent | null;
+  lastChanges: ChangeEvent[];
   ts: number;
 }
 

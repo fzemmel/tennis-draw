@@ -30,7 +30,7 @@ export const Home: Story = {
     title: "HEIM",
     players: ["Fidschi", "Nic"],
     serverName: "Fidschi",
-    incomingName: undefined,
+    incomingNames: [],
   },
 };
 
@@ -39,7 +39,7 @@ export const Guest: Story = {
     title: "GAST",
     players: ["Alex", "Benni"],
     serverName: "Benni",
-    incomingName: "Alex",
+    incomingNames: ["Alex"],
   },
 };
 
@@ -49,6 +49,16 @@ export const WithIncomingPlayer: Story = {
     title: "HEIM",
     players: ["Teja", "Nic"],
     serverName: "Nic",
-    incomingName: "Teja",
+    incomingNames: ["Teja"],
+  },
+};
+
+export const WithTwoIncomingPlayers: Story = {
+  name: "With two incoming players (double sub)",
+  args: {
+    title: "HEIM",
+    players: ["Teja", "Nic"],
+    serverName: "Nic",
+    incomingNames: ["Teja", "Nic"],
   },
 };

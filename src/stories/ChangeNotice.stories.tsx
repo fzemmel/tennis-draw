@@ -27,12 +27,21 @@ type Story = StoryObj<typeof ChangeNotice>;
 
 export const HomeChange: Story = {
   args: {
-    change: { in: "Andre", out: "Nic", team: "HEIM" },
+    changes: [{ in: "Andre", out: "Nic", team: "HEIM" }],
   },
 };
 
 export const GuestChange: Story = {
   args: {
-    change: { in: "Teja", out: "Benni", team: "GAST" },
+    changes: [{ in: "Teja", out: "Benni", team: "GAST" }],
+  },
+};
+
+export const DoubleChange: Story = {
+  args: {
+    changes: [
+      { in: "Andre", out: "Nic", team: "HEIM" },
+      { in: "Fidschi", out: "Alex", team: "GAST" },
+    ],
   },
 };
