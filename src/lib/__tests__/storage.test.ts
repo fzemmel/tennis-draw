@@ -161,3 +161,121 @@ describe("pollSharedState", () => {
     expect(result).toBeNull();
   });
 });
+
+// ---------------------------------------------------------------------------
+// loadPlayerPool / savePlayerPool
+// ---------------------------------------------------------------------------
+describe("loadPlayerPool", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("returns the default PLAYERS pool when nothing is stored", async () => {
+    const { loadPlayerPool } = await import("../storage");
+    const { PLAYERS } = await import("../tennis");
+    const pool = loadPlayerPool();
+    expect(pool).toEqual([...PLAYERS]);
+  });
+
+  it("returns the saved pool from localStorage", async () => {
+    const customPool = ["Alice", "Bob", "Carol", "Dave", "Eve"];
+    localStorage.setItem("tennis_pool_v1", JSON.stringify(customPool));
+    const { loadPlayerPool } = await import("../storage");
+    expect(loadPlayerPool()).toEqual(customPool);
+  });
+
+  it("falls back to the default pool when localStorage contains invalid JSON", async () => {
+    localStorage.setItem("tennis_pool_v1", "not-json");
+    const { loadPlayerPool } = await import("../storage");
+    const { PLAYERS } = await import("../tennis");
+    expect(loadPlayerPool()).toEqual([...PLAYERS]);
+  });
+
+  it("falls back to the default pool when localStorage contains an object", async () => {
+    localStorage.setItem("tennis_pool_v1", JSON.stringify({ foo: "bar" }));
+    const { loadPlayerPool } = await import("../storage");
+    const { PLAYERS } = await import("../tennis");
+    expect(loadPlayerPool()).toEqual([...PLAYERS]);
+  });
+
+  it("falls back to the default pool when localStorage contains an array of non-strings", async () => {
+    localStorage.setItem("tennis_pool_v1", JSON.stringify([1, 2, null, "x"]));
+    const { loadPlayerPool } = await import("../storage");
+    const { PLAYERS } = await import("../tennis");
+    expect(loadPlayerPool()).toEqual([...PLAYERS]);
+  });
+});
+
+describe("savePlayerPool", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("persists the pool to localStorage", async () => {
+    const pool = ["Alice", "Bob", "Carol", "Dave", "Eve"];
+    const { savePlayerPool } = await import("../storage");
+    savePlayerPool(pool);
+    expect(JSON.parse(localStorage.getItem("tennis_pool_v1")!)).toEqual(pool);
+  });
+
+  it("round-trips correctly via loadPlayerPool", async () => {
+    const pool = ["X1", "X2", "X3", "X4", "X5", "X6"];
+    const { savePlayerPool, loadPlayerPool } = await import("../storage");
+    savePlayerPool(pool);
+    expect(loadPlayerPool()).toEqual(pool);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// clearState
+// ---------------------------------------------------------------------------
+describe("clearState", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+    delete window.storage;
+  });
+
+  it("removes the state key from localStorage", async () => {
+    const state = makeState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const { clearState } = await import("../storage");
+    await clearState("local");
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  it("clears window.storage when mode='shared'", async () => {
+    const mockSet = vi.fn().mockResolvedValue(undefined);
+    window.storage = {
+      get: vi.fn().mockResolvedValue(null),
+      set: mockSet,
+    };
+    const { clearState } = await import("../storage");
+    await clearState("shared");
+    expect(mockSet).toHaveBeenCalledWith(STORAGE_KEY, "", true);
+  });
+
+  it("does not call window.storage when mode='local'", async () => {
+    const mockSet = vi.fn().mockResolvedValue(undefined);
+    window.storage = {
+      get: vi.fn().mockResolvedValue(null),
+      set: mockSet,
+    };
+    const { clearState } = await import("../storage");
+    await clearState("local");
+    expect(mockSet).not.toHaveBeenCalled();
+  });
+
+  it("after clearState, loadState returns null", async () => {
+    const state = makeState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const { clearState, loadState } = await import("../storage");
+    await clearState("local");
+    const result = await loadState();
+    expect(result.state).toBeNull();
+  });
+});

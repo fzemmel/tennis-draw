@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RefreshCw, RotateCcw, BarChart3, ChevronDown, ChevronUp } from "lucide-react";
-import { PLAYERS, initState, computeNext, serverFor } from "../../lib/tennis";
-import { loadState, saveState, pollSharedState } from "../../lib/storage";
+import { initState, computeNext, serverFor } from "../../lib/tennis";
+import { loadState, saveState, pollSharedState, loadPlayerPool, savePlayerPool, clearState } from "../../lib/storage";
 import type { GameState, SyncMode } from "../../lib/types";
 import { Button } from "../ui/Button";
 import { TeamCard } from "./TeamCard";
@@ -10,9 +10,11 @@ import { ChangeNotice } from "./ChangeNotice";
 import { SyncBadge } from "./SyncBadge";
 import { StatTable } from "./StatTable";
 import { PartnerMatrix } from "./PartnerMatrix";
+import { Splashscreen } from "./Splashscreen";
 
 export function TennisMixer() {
   const [state, setState] = useState<GameState | null>(null);
+  const [playerPool, setPlayerPool] = useState<string[]>([]);
   const [syncMode, setSyncMode] = useState<SyncMode>("local");
   const [loading, setLoading] = useState(true);
   const [showStats, setShowStats] = useState(false);
@@ -22,17 +24,14 @@ export function TennisMixer() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      const pool = loadPlayerPool();
       const { state: loaded, mode } = await loadState();
-      const finalState = loaded ?? initState(PLAYERS);
 
       if (!cancelled) {
-        setState(finalState);
+        setPlayerPool(pool);
+        setState(loaded); // null → show Splashscreen
         setSyncMode(mode);
         setLoading(false);
-
-        if (!loaded) {
-          await saveState(finalState, mode);
-        }
       }
     })();
     return () => {
@@ -65,7 +64,17 @@ export function TennisMixer() {
     persist(computeNext(state));
   }
 
-  function reset() {
+  function handleStart(orderedPlayers: string[]) {
+    const newState = initState(orderedPlayers);
+    persist(newState);
+  }
+
+  function handlePoolChange(pool: string[]) {
+    setPlayerPool(pool);
+    savePlayerPool(pool);
+  }
+
+  async function reset() {
     if (syncMode === "shared" && !confirmReset) {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
@@ -73,10 +82,11 @@ export function TennisMixer() {
     }
     setConfirmReset(false);
     setShowStats(false);
-    persist(initState(PLAYERS));
+    await clearState(syncMode);
+    setState(null);
   }
 
-  if (loading || !state) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-dvh bg-slate-950 text-slate-400">
         Lädt…
@@ -84,10 +94,21 @@ export function TennisMixer() {
     );
   }
 
+  if (!state) {
+    return (
+      <Splashscreen
+        pool={playerPool}
+        onStart={handleStart}
+        onPoolChange={handlePoolChange}
+      />
+    );
+  }
+
+  const players = Object.keys(state.playCount);
   const server = serverFor(state.round, state.home, state.guest);
   const incomingName = state.lastChange?.in;
 
-  const statRows = PLAYERS.map((p) => ({
+  const statRows = players.map((p) => ({
     name: p,
     play: state.playCount[p] ?? 0,
     bench: state.benchCount[p] ?? 0,
@@ -186,7 +207,7 @@ export function TennisMixer() {
         <div className="mt-3.5 bg-slate-800 rounded-xl p-3.5 space-y-4">
           <StatTable rows={statRows} />
           <PartnerMatrix
-            players={PLAYERS}
+            players={players}
             partnerCount={state.partnerCount}
           />
         </div>
