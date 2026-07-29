@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RefreshCw, RotateCcw, BarChart3, ChevronDown, ChevronUp } from "lucide-react";
 import { initState, computeNext, serverFor } from "../../lib/tennis";
-import { loadState, saveState, pollSharedState, loadPlayerPool, savePlayerPool } from "../../lib/storage";
+import { loadState, saveState, pollSharedState, loadPlayerPool, savePlayerPool, clearState } from "../../lib/storage";
 import type { GameState, SyncMode } from "../../lib/types";
 import { Button } from "../ui/Button";
 import { TeamCard } from "./TeamCard";
@@ -74,7 +74,7 @@ export function TennisMixer() {
     savePlayerPool(pool);
   }
 
-  function reset() {
+  async function reset() {
     if (syncMode === "shared" && !confirmReset) {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
@@ -82,7 +82,7 @@ export function TennisMixer() {
     }
     setConfirmReset(false);
     setShowStats(false);
-    try { localStorage.removeItem("tennis_state_v1"); } catch { /* ignore */ }
+    await clearState(syncMode);
     setState(null);
   }
 

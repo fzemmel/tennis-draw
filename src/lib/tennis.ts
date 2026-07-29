@@ -43,6 +43,9 @@ function recordCurrent(
 }
 
 export function initState(players: readonly string[]): GameState {
+  if (players.length < 5) {
+    throw new Error(`initState requires at least 5 players, got ${players.length}`);
+  }
   const [p0, p1, p2, p3, bench] = players;
   const home: [string, string] = [p0, p1];
   const guest: [string, string] = [p2, p3];

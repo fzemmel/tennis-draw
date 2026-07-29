@@ -89,11 +89,35 @@ export async function pollSharedState(): Promise<GameState | null> {
 export function loadPlayerPool(): string[] {
   try {
     const raw = localStorage.getItem(POOL_KEY);
-    if (raw) return JSON.parse(raw) as string[];
+    if (raw) {
+      const parsed: unknown = JSON.parse(raw);
+      if (
+        Array.isArray(parsed) &&
+        parsed.every((item) => typeof item === "string")
+      ) {
+        return parsed as string[];
+      }
+    }
   } catch {
     // Fall through to default
   }
   return [...PLAYERS];
+}
+
+export async function clearState(mode: SyncMode): Promise<void> {
+  MEM.current = null;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+  if (mode === "shared" && typeof window !== "undefined" && window.storage) {
+    try {
+      await window.storage.set(STORAGE_KEY, "", true);
+    } catch {
+      // ignore
+    }
+  }
 }
 
 export function savePlayerPool(pool: string[]): void {

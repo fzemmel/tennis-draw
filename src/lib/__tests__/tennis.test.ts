@@ -73,6 +73,12 @@ describe("initState", () => {
     expect(PLAYERS).toHaveLength(6);
   });
 
+  it("throws when fewer than 5 players are passed", () => {
+    expect(() => initState(["A", "B", "C"])).toThrow(
+      "initState requires at least 5 players, got 3",
+    );
+  });
+
   it("puts exactly 4 players on court and 1 on the bench", () => {
     const state = initState(FIVE);
     const onCourt = new Set([...state.home, ...state.guest]);

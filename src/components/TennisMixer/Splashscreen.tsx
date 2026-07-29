@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { GripVertical, Plus, X } from "lucide-react";
 import { Button } from "../ui/Button";
+import { PLAYERS } from "../../lib/tennis";
 
 interface SplashscreenProps {
   pool: string[];
@@ -65,9 +66,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
   const canStart = selected.length === 5;
 
   // Players in the pool that are not default (custom)
-  const customPlayers = pool.filter(
-    (p) => !["Teja", "Nic", "Benni", "Alex", "Andre", "Fidschi"].includes(p),
-  );
+  const customPlayers = pool.filter((p) => !PLAYERS.includes(p));
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center px-4 py-8">
@@ -76,13 +75,13 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
         <div className="text-center">
           <div className="text-4xl mb-2">🎾</div>
           <h1 className="text-2xl font-bold text-slate-50">Tennis-Mixer</h1>
-          <p className="text-slate-400 text-sm mt-1">Wer spielt heute?</p>
+          <p className="text-slate-400 text-sm mt-1">Who is playing today?</p>
         </div>
 
         {/* Player pool */}
         <div>
           <div className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-2">
-            Spieler auswählen
+            Select players
           </div>
           <div className="flex flex-wrap gap-2">
             {pool.map((name) => {
@@ -105,7 +104,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
                     <button
                       onClick={() => removeFromPool(name)}
                       className="absolute -top-1.5 -right-1.5 hidden group-hover:flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white"
-                      aria-label={`${name} entfernen`}
+                      aria-label={`Remove ${name}`}
                     >
                       <X size={10} />
                     </button>
@@ -122,7 +121,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addCustomPlayer()}
-              placeholder="Spieler hinzufügen…"
+              placeholder="Add player…"
               maxLength={20}
               className="flex-1 bg-slate-800 border border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-slate-400"
             />
@@ -130,7 +129,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
               size="sm"
               onClick={addCustomPlayer}
               disabled={!customInput.trim() || pool.includes(customInput.trim())}
-              aria-label="Spieler hinzufügen"
+              aria-label="Add player"
             >
               <Plus size={16} />
             </Button>
@@ -141,7 +140,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <div className="text-xs font-bold tracking-widest text-slate-400 uppercase">
-              Aufstellung
+              Lineup
             </div>
             <div
               className={[
@@ -149,13 +148,13 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
                 canStart ? "text-green-400" : "text-yellow-400",
               ].join(" ")}
             >
-              {selected.length}/5 gewählt
+              {selected.length}/5 selected
             </div>
           </div>
 
           {selected.length === 0 ? (
             <p className="text-slate-500 text-sm text-center py-4">
-              Wähle 5 Spieler oben aus.
+              Select 5 players above.
             </p>
           ) : (
             <div className="flex flex-col gap-1.5">
@@ -193,12 +192,12 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
 
           {selected.length > 5 && (
             <p className="text-yellow-400 text-xs mt-2 text-center">
-              Bitte genau 5 Spieler auswählen ({selected.length} gewählt).
+              Please select exactly 5 players ({selected.length} selected).
             </p>
           )}
           {selected.length < 5 && selected.length > 0 && (
             <p className="text-yellow-400 text-xs mt-2 text-center">
-              Noch {5 - selected.length} Spieler fehlen.
+              {5 - selected.length} more player{5 - selected.length === 1 ? "" : "s"} needed.
             </p>
           )}
         </div>
@@ -211,7 +210,7 @@ export function Splashscreen({ pool, onStart, onPoolChange }: SplashscreenProps)
           disabled={!canStart}
           onClick={() => canStart && onStart(selected)}
         >
-          Spiel starten →
+          Start game →
         </Button>
       </div>
     </div>
