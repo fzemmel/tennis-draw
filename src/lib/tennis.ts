@@ -46,7 +46,7 @@ export function initState(players: readonly string[]): GameState {
   if (players.length < 5) {
     throw new Error(`initState requires at least 5 players, got ${players.length}`);
   }
-  const [p0, p1, p2, p3, bench] = players;
+  const [p0, p1, p2, p3, ...benchPlayers] = players;
   const home: [string, string] = [p0, p1];
   const guest: [string, string] = [p2, p3];
 
@@ -63,7 +63,9 @@ export function initState(players: readonly string[]): GameState {
   [p0, p1, p2, p3].forEach((p) => {
     playCount[p] = 1;
   });
-  benchCount[bench] = 1;
+  benchPlayers.forEach((p) => {
+    benchCount[p] = 1;
+  });
 
   const partnerCount: Record<string, number> = {
     [pairKey(home[0], home[1])]: 1,
@@ -83,7 +85,7 @@ export function initState(players: readonly string[]): GameState {
   return {
     home,
     guest,
-    bench,
+    bench: benchPlayers,
     playCount,
     benchCount,
     serveCount,
@@ -91,16 +93,23 @@ export function initState(players: readonly string[]): GameState {
     opponentCount,
     round: 1,
     lastIn: null,
-    lastChange: null,
+    lastChanges: [],
     ts: Date.now(),
   };
 }
 
-/** Berechnet den nächsten optimalen Wechsel, ohne den State zu mutieren. */
-export function computeNext(s: GameState): GameState {
-  const incoming = s.bench;
+/** Performs a single substitution (bench[0] in, one court player out) without touching round or serve.
+ *  newlyIn contains all players already subbed in during the current computeNext call; they are
+ *  excluded from outgoing candidates so no player is subbed in and out in the same round. */
+function performSingleSub(
+  s: GameState,
+  newlyIn: ReadonlySet<string>,
+): { state: GameState; change: ChangeEvent } {
+  const incoming = s.bench[0];
   const court = [...s.home, ...s.guest];
-  let candidates = court.filter((p) => p !== s.lastIn);
+  // Exclude the previous lastIn AND everyone who came in earlier this round
+  let candidates = court.filter((p) => p !== s.lastIn && !newlyIn.has(p));
+  if (candidates.length === 0) candidates = court.filter((p) => !newlyIn.has(p));
   if (candidates.length === 0) candidates = court;
 
   const minBench = Math.min(...candidates.map((p) => s.benchCount[p] || 0));
@@ -147,33 +156,57 @@ export function computeNext(s: GameState): GameState {
   playCount[incoming] = (playCount[incoming] || 0) + 1;
   benchCount[out] = (benchCount[out] || 0) + 1;
 
+  const newBench = [...s.bench.slice(1), out];
+
+  const team = newHome.includes(incoming) ? "HEIM" : "GAST";
+  const change: ChangeEvent = { in: incoming, out, team };
+
   const ns: GameState = {
     ...s,
     home: newHome,
     guest: newGuest,
-    bench: out,
+    bench: newBench,
     playCount,
     benchCount,
-    round: s.round + 1,
     lastIn: incoming,
-    ts: s.ts,
-    lastChange: null,
-    partnerCount: s.partnerCount,
-    opponentCount: s.opponentCount,
+    lastChanges: [],
   };
 
-  const { partnerCount, opponentCount } = recordCurrent(ns);
-  ns.partnerCount = partnerCount;
-  ns.opponentCount = opponentCount;
+  return { state: ns, change };
+}
 
-  const serveCount = { ...s.serveCount };
-  const srv = serverFor(ns.round, ns.home, ns.guest);
+/** Computes the next optimal substitution without mutating the input state.
+ *  With multiple bench players (≥ 2) all bench players rotate in simultaneously per round. */
+export function computeNext(s: GameState): GameState {
+  const swapCount = s.bench.length;
+  const changes: ChangeEvent[] = [];
+  const newlyIn = new Set<string>(); // all players subbed in during this call
+
+  // Chain single swaps — one per bench player
+  let cur = s;
+  for (let i = 0; i < swapCount; i++) {
+    const { state, change } = performSingleSub(cur, newlyIn);
+    changes.push(change);
+    newlyIn.add(change.in);
+    cur = state;
+  }
+
+  // Record pairings for the final court lineup once
+  const { partnerCount, opponentCount } = recordCurrent(cur);
+
+  // Increment round once per computeNext call regardless of swap count
+  const newRound = s.round + 1;
+  const serveCount = { ...cur.serveCount };
+  const srv = serverFor(newRound, cur.home, cur.guest);
   serveCount[srv.name] = (serveCount[srv.name] || 0) + 1;
-  ns.serveCount = serveCount;
 
-  const team = newHome.includes(incoming) ? "HEIM" : "GAST";
-  const change: ChangeEvent = { in: incoming, out, team };
-  ns.lastChange = change;
-
-  return ns;
+  return {
+    ...cur,
+    round: newRound,
+    partnerCount,
+    opponentCount,
+    serveCount,
+    ts: s.ts,
+    lastChanges: changes,
+  };
 }

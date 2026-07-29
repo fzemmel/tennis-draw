@@ -3,7 +3,7 @@
 export interface GameState {
   home: [string, string];
   guest: [string, string];
-  bench: string;
+  bench: string[];
   playCount: Record<string, number>;
   benchCount: Record<string, number>;
   serveCount: Record<string, number>;
@@ -11,7 +11,7 @@ export interface GameState {
   opponentCount: Record<string, number>;
   round: number;
   lastIn: string | null;
-  lastChange: ChangeEvent | null;
+  lastChanges: ChangeEvent[];
   ts: number;
 }
 

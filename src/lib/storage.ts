@@ -18,6 +18,20 @@ declare global {
   }
 }
 
+/** Migrate persisted state from older schema versions to the current one. */
+function migrateState(raw: unknown): GameState {
+  const state = raw as GameState & { bench: unknown; lastChange?: unknown };
+  // v1→v2: bench changed from string to string[]
+  if (typeof state.bench === "string") {
+    state.bench = state.bench ? [state.bench] : [];
+  }
+  // v2→v3: lastChange removed; replaced with lastChanges
+  if (!Array.isArray(state.lastChanges)) {
+    state.lastChanges = [];
+  }
+  return state as GameState;
+}
+
 export async function loadState(): Promise<{
   state: GameState | null;
   mode: SyncMode;
@@ -28,7 +42,7 @@ export async function loadState(): Promise<{
     try {
       const r = await window.storage!.get(STORAGE_KEY, true);
       if (r?.value) {
-        const state = JSON.parse(r.value) as GameState;
+        const state = migrateState(JSON.parse(r.value));
         return { state, mode: "shared" };
       }
     } catch {
@@ -39,7 +53,7 @@ export async function loadState(): Promise<{
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const state = JSON.parse(raw) as GameState;
+      const state = migrateState(JSON.parse(raw));
       return { state, mode: "local" };
     }
   } catch {
@@ -76,7 +90,7 @@ export async function pollSharedState(): Promise<GameState | null> {
   if (typeof window === "undefined" || !window.storage) return null;
   try {
     const r = await window.storage.get(STORAGE_KEY, true);
-    if (r?.value) return JSON.parse(r.value) as GameState;
+    if (r?.value) return migrateState(JSON.parse(r.value));
   } catch {
     // Ignore shared polling failures.
   }

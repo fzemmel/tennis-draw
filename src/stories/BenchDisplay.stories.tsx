@@ -25,8 +25,20 @@ const meta: Meta<typeof BenchDisplay> = {
 export default meta;
 type Story = StoryObj<typeof BenchDisplay>;
 
-export const Default: Story = {
+export const SingleBench: Story = {
   args: {
-    player: "Andre",
+    players: ["Andre"],
+  },
+};
+
+export const TwoBench: Story = {
+  args: {
+    players: ["Andre", "Fidschi"],
+  },
+};
+
+export const ThreeBench: Story = {
+  args: {
+    players: ["Andre", "Fidschi", "Robin"],
   },
 };

@@ -8,7 +8,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
   return {
     home: ["A", "B"],
     guest: ["C", "D"],
-    bench: "E",
+    bench: ["E"],
     playCount: { A: 1, B: 1, C: 1, D: 1, E: 0 },
     benchCount: { A: 0, B: 0, C: 0, D: 0, E: 1 },
     serveCount: { A: 1, B: 0, C: 0, D: 0, E: 0 },
@@ -16,7 +16,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
     opponentCount: { "A|C": 1, "A|D": 1, "B|C": 1, "B|D": 1 },
     round: 1,
     lastIn: null,
-    lastChange: null,
+    lastChanges: [],
     ts: 1000,
     ...overrides,
   };
@@ -75,6 +75,22 @@ describe("loadState", () => {
     const result = await loadState();
     expect(result.mode).toBe("local");
     expect(result.state?.round).toBe(3);
+  });
+
+  it("migrates old bench: string to bench: string[]", async () => {
+    const oldState = { ...makeState(), bench: "E" };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(oldState));
+    const { loadState } = await import("../storage");
+    const result = await loadState();
+    expect(result.state?.bench).toEqual(["E"]);
+  });
+
+  it("migrates missing lastChanges to empty array", async () => {
+    const oldState = { ...makeState(), lastChanges: undefined, lastChange: null };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(oldState));
+    const { loadState } = await import("../storage");
+    const result = await loadState();
+    expect(result.state?.lastChanges).toEqual([]);
   });
 });
 

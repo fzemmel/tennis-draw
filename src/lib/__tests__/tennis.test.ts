@@ -83,14 +83,14 @@ describe("initState", () => {
     const state = initState(FIVE);
     const onCourt = new Set([...state.home, ...state.guest]);
     expect(onCourt.size).toBe(4);
-    expect(state.bench).toBeTruthy();
-    expect(onCourt.has(state.bench)).toBe(false);
+    expect(state.bench).toHaveLength(1);
+    expect(onCourt.has(state.bench[0])).toBe(false);
   });
 
   it("the last player in the input array starts on the bench", () => {
     const ordered = ["A", "B", "C", "D", "E"];
     const state = initState(ordered);
-    expect(state.bench).toBe("E");
+    expect(state.bench).toEqual(["E"]);
   });
 
   it("includes all 5 players in playCount and benchCount", () => {
@@ -109,7 +109,7 @@ describe("initState", () => {
 
   it("benchCount of the bench player is 1, rest are 0", () => {
     const state = initState(FIVE);
-    const benchPlayer = state.bench;
+    const benchPlayer = state.bench[0];
     expect(state.benchCount[benchPlayer]).toBe(1);
     FIVE.filter((p) => p !== benchPlayer).forEach((p) => {
       expect(state.benchCount[p]).toBe(0);
@@ -139,25 +139,25 @@ describe("initState", () => {
 describe("computeNext", () => {
   it("returns a new state without mutating the original", () => {
     const s1 = initState(FIVE);
-    const benchBefore = s1.bench;
+    const benchBefore = [...s1.bench];
     const s2 = computeNext(s1);
-    expect(s1.bench).toBe(benchBefore); // no mutation
+    expect(s1.bench).toEqual(benchBefore); // no mutation
     expect(s2).not.toBe(s1);
   });
 
-  it("the former bench player is now on court", () => {
+  it("the former bench[0] player is now on court", () => {
     const s1 = initState(FIVE);
-    const formerBench = s1.bench;
+    const formerBench = s1.bench[0];
     const s2 = computeNext(s1);
     const onCourt = new Set([...s2.home, ...s2.guest]);
     expect(onCourt.has(formerBench)).toBe(true);
   });
 
-  it("the new bench player was previously on court", () => {
+  it("the new bench[0] player was previously on court", () => {
     const s1 = initState(FIVE);
     const courtBefore = new Set([...s1.home, ...s1.guest]);
     const s2 = computeNext(s1);
-    expect(courtBefore.has(s2.bench)).toBe(true);
+    expect(courtBefore.has(s2.bench[0])).toBe(true);
   });
 
   it("increments round by 1", () => {
@@ -168,7 +168,7 @@ describe("computeNext", () => {
 
   it("lastIn points to the newly substituted-in player", () => {
     const s1 = initState(FIVE);
-    const incoming = s1.bench;
+    const incoming = s1.bench[0];
     const s2 = computeNext(s1);
     expect(s2.lastIn).toBe(incoming);
   });
@@ -178,17 +178,17 @@ describe("computeNext", () => {
     const s2 = computeNext(s1);
     const lastIn = s2.lastIn!;
     const s3 = computeNext(s2);
-    // lastIn must not become the new bench player unless there is no other choice
+    // lastIn must not become the new bench[0] unless there is no other choice
     const courtPlayers = [...s2.home, ...s2.guest];
     const candidates = courtPlayers.filter((p) => p !== lastIn);
     if (candidates.length > 0) {
-      expect(s3.bench).not.toBe(lastIn);
+      expect(s3.bench[0]).not.toBe(lastIn);
     }
   });
 
   it("increments playCount of the incoming player by 1", () => {
     const s1 = initState(FIVE);
-    const incoming = s1.bench;
+    const incoming = s1.bench[0];
     const s2 = computeNext(s1);
     expect(s2.playCount[incoming]).toBe(s1.playCount[incoming] + 1);
   });
@@ -196,18 +196,18 @@ describe("computeNext", () => {
   it("increments benchCount of the substituted-out player by 1", () => {
     const s1 = initState(FIVE);
     const s2 = computeNext(s1);
-    const outPlayer = s2.bench;
+    const outPlayer = s2.bench[0];
     expect(s2.benchCount[outPlayer]).toBe(s1.benchCount[outPlayer] + 1);
   });
 
-  it("lastChange contains the correct substitution information", () => {
+  it("lastChanges contains the correct substitution information", () => {
     const s1 = initState(FIVE);
-    const incoming = s1.bench;
+    const incoming = s1.bench[0];
     const s2 = computeNext(s1);
-    expect(s2.lastChange).not.toBeNull();
-    expect(s2.lastChange!.in).toBe(incoming);
-    expect(s2.lastChange!.out).toBe(s2.bench);
-    expect(["HEIM", "GAST"]).toContain(s2.lastChange!.team);
+    expect(s2.lastChanges).toHaveLength(1);
+    expect(s2.lastChanges[0].in).toBe(incoming);
+    expect(s2.lastChanges[0].out).toBe(s2.bench[s2.bench.length - 1]);
+    expect(["HEIM", "GAST"]).toContain(s2.lastChanges[0].team);
   });
 
   it("partnerCount of the new team pair is updated after the substitution", () => {
@@ -237,5 +237,154 @@ describe("computeNext", () => {
     const s2 = computeNext(s1);
     const totalServes = Object.values(s2.serveCount).reduce((a, b) => a + b, 0);
     expect(totalServes).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 6-player scenarios
+// ---------------------------------------------------------------------------
+const SIX = ["A", "B", "C", "D", "E", "F"];
+const SEVEN = ["A", "B", "C", "D", "E", "F", "G"];
+
+describe("initState — 6 players", () => {
+  it("bench array contains exactly 2 players", () => {
+    const state = initState(SIX);
+    expect(state.bench).toHaveLength(2);
+  });
+
+  it("bench players are the last 2 in the input array", () => {
+    const state = initState(SIX);
+    expect(state.bench).toEqual(["E", "F"]);
+  });
+
+  it("all 6 players tracked in playCount and benchCount", () => {
+    const state = initState(SIX);
+    SIX.forEach((p) => {
+      expect(p in state.playCount).toBe(true);
+      expect(p in state.benchCount).toBe(true);
+    });
+  });
+
+  it("both bench players have benchCount = 1", () => {
+    const state = initState(SIX);
+    expect(state.benchCount["E"]).toBe(1);
+    expect(state.benchCount["F"]).toBe(1);
+  });
+
+  it("court players have playCount = 1, bench players have playCount = 0", () => {
+    const state = initState(SIX);
+    ["A", "B", "C", "D"].forEach((p) => expect(state.playCount[p]).toBe(1));
+    ["E", "F"].forEach((p) => expect(state.playCount[p]).toBe(0));
+  });
+});
+
+describe("initState — 7 players", () => {
+  it("bench array contains exactly 3 players", () => {
+    const state = initState(SEVEN);
+    expect(state.bench).toHaveLength(3);
+  });
+
+  it("bench players are the last 3 in the input array", () => {
+    const state = initState(SEVEN);
+    expect(state.bench).toEqual(["E", "F", "G"]);
+  });
+});
+
+describe("computeNext — 6 players FIFO rotation", () => {
+  it("bench has exactly 2 players after each substitution", () => {
+    let state = initState(SIX);
+    for (let i = 0; i < 10; i++) {
+      state = computeNext(state);
+      expect(state.bench).toHaveLength(2);
+    }
+  });
+
+  it("incoming players are bench[0] and bench[1] (both come in)", () => {
+    let state = initState(SIX);
+    for (let i = 0; i < 6; i++) {
+      const expectedIn0 = state.bench[0];
+      const expectedIn1 = state.bench[1];
+      state = computeNext(state);
+      const incomingNames = state.lastChanges.map((c) => c.in);
+      expect(incomingNames).toContain(expectedIn0);
+      expect(incomingNames).toContain(expectedIn1);
+    }
+  });
+
+  it("both bench players come in per round — lastChanges has 2 entries", () => {
+    let state = initState(SIX);
+    state = computeNext(state);
+    expect(state.lastChanges).toHaveLength(2);
+  });
+
+  it("outgoing players form the new bench", () => {
+    let state = initState(SIX);
+    for (let i = 0; i < 6; i++) {
+      const prevBench = [...state.bench];
+      state = computeNext(state);
+      // The outgoing players (from lastChanges) are now on bench
+      const outPlayers = state.lastChanges.map((c) => c.out);
+      outPlayers.forEach((p) => expect(state.bench).toContain(p));
+      // The former bench players are no longer on bench
+      prevBench.forEach((p) => expect(state.bench).not.toContain(p));
+    }
+  });
+
+  it("does not throw over 20 consecutive substitutions with 6 players", () => {
+    let state = initState(SIX);
+    expect(() => {
+      for (let i = 0; i < 20; i++) state = computeNext(state);
+    }).not.toThrow();
+  });
+
+  it("20-round simulation: max bench-count spread ≤ 1 across all 6 players", () => {
+    let state = initState(SIX);
+    for (let i = 0; i < 20; i++) state = computeNext(state);
+    const counts = SIX.map((p) => state.benchCount[p]);
+    expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("computeNext — 7 players FIFO rotation", () => {
+  it("bench has exactly 3 players after each substitution", () => {
+    let state = initState(SEVEN);
+    for (let i = 0; i < 10; i++) {
+      state = computeNext(state);
+      expect(state.bench).toHaveLength(3);
+    }
+  });
+
+  it("incoming player is always bench[0] (FIFO order)", () => {
+    let state = initState(SEVEN);
+    for (let i = 0; i < 7; i++) {
+      const expectedIn = state.bench[0];
+      state = computeNext(state);
+      expect(state.lastChanges[0].in).toBe(expectedIn);
+    }
+  });
+
+  it("does not throw over 20 consecutive substitutions with 7 players", () => {
+    let state = initState(SEVEN);
+    expect(() => {
+      for (let i = 0; i < 20; i++) state = computeNext(state);
+    }).not.toThrow();
+  });
+
+  it("20-round simulation: max bench-count spread ≤ 1 across all 7 players", () => {
+    let state = initState(SEVEN);
+    for (let i = 0; i < 20; i++) state = computeNext(state);
+    const counts = SEVEN.map((p) => state.benchCount[p]);
+    expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+  });
+
+  it("no player is subbed in and immediately subbed out in the same round", () => {
+    let state = initState(SEVEN);
+    for (let i = 0; i < 20; i++) {
+      const inPlayers = new Set(state.bench);
+      state = computeNext(state);
+      const outPlayers = new Set(state.lastChanges.map((c) => c.out));
+      // No player who was on bench (and came in) should also appear as out
+      inPlayers.forEach((p) => expect(outPlayers.has(p)).toBe(false));
+    }
   });
 });

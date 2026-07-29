@@ -23,6 +23,7 @@ interface Translations {
   bench: {
     label: string;
     badge: string;
+    nextUp: string;
   };
   teamCard: {
     newBadge: string;
@@ -40,7 +41,6 @@ interface Translations {
     lineup: string;
     selectedCount: (count: number) => string;
     emptySelection: string;
-    exactFive: (count: number) => string;
     moreNeeded: (count: number) => string;
     start: string;
   };
@@ -81,6 +81,7 @@ const translations: Record<Language, Translations> = {
     bench: {
       label: "PAUSE ☕",
       badge: "BANK",
+      nextUp: "Nächster",
     },
     teamCard: {
       newBadge: "NEU",
@@ -99,10 +100,8 @@ const translations: Record<Language, Translations> = {
       addPlayer: "Spieler hinzufügen",
       removePlayer: (name) => `${name} entfernen`,
       lineup: "Aufstellung",
-      selectedCount: (count) => `${count}/5 ausgewählt`,
-      emptySelection: "Wähle oben 5 Spieler aus.",
-      exactFive: (count) =>
-        `Bitte genau 5 Spieler auswählen (${count}/5 ausgewählt).`,
+      selectedCount: (count) => `${count} ausgewählt`,
+      emptySelection: "Wähle oben mind. 5 Spieler aus.",
       moreNeeded: (count) =>
         count === 1 ? "1 weiterer Spieler nötig." : `${count} weitere Spieler nötig.`,
       start: "Spiel starten →",
@@ -143,6 +142,7 @@ const translations: Record<Language, Translations> = {
     bench: {
       label: "BENCH ☕",
       badge: "BENCH",
+      nextUp: "Next up",
     },
     teamCard: {
       newBadge: "NEW",
@@ -161,10 +161,8 @@ const translations: Record<Language, Translations> = {
       addPlayer: "Add player",
       removePlayer: (name) => `Remove ${name}`,
       lineup: "Lineup",
-      selectedCount: (count) => `${count}/5 selected`,
-      emptySelection: "Select 5 players above.",
-      exactFive: (count) =>
-        `Please select exactly 5 players (${count}/5 selected).`,
+      selectedCount: (count) => `${count} selected`,
+      emptySelection: "Select at least 5 players above.",
       moreNeeded: (count) =>
         count === 1 ? "1 more player needed." : `${count} more players needed.`,
       start: "Start game →",

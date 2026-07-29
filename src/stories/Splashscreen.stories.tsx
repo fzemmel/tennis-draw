@@ -93,10 +93,26 @@ export const ReadyToStart: Story = {
   },
 };
 
-export const OverSelected: Story = {
-  play: async ({ canvas, userEvent }) => {
+export const SixPlayersReadyToStart: Story = {
+  play: async ({ args, canvas, globals, userEvent }) => {
+    const t = getTranslations(storyLanguage(globals.locale));
+    // Select the 6th player to add them to the lineup
     await userEvent.click(canvas.getByRole("button", { name: PLAYERS[5] }));
-    await expect(canvas.getByText(/6\/5/)).toBeInTheDocument();
+    await expect(canvas.getByText(t.splash.selectedCount(6))).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: t.splash.start }));
+    await expect(args.onStart).toHaveBeenCalledWith(PLAYERS.slice(0, 6));
+  },
+};
+
+export const OverSelected: Story = {
+  args: {
+    pool: ["Robin", ...PLAYERS],
+  },
+  play: async ({ canvas, globals, userEvent }) => {
+    const t = getTranslations(storyLanguage(globals.locale));
+    // Select Robin to make 7 players selected
+    await userEvent.click(canvas.getByRole("button", { name: "Robin" }));
+    await expect(canvas.getByText(t.splash.selectedCount(7))).toBeInTheDocument();
   },
 };
 
