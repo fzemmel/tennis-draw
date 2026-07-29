@@ -8,7 +8,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
   return {
     home: ["A", "B"],
     guest: ["C", "D"],
-    bench: "E",
+    bench: ["E"],
     playCount: { A: 1, B: 1, C: 1, D: 1, E: 0 },
     benchCount: { A: 0, B: 0, C: 0, D: 0, E: 1 },
     serveCount: { A: 1, B: 0, C: 0, D: 0, E: 0 },
