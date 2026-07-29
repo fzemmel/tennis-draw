@@ -7,7 +7,10 @@ interface BenchDisplayProps {
 
 export function BenchDisplay({ players, language }: BenchDisplayProps) {
   const t = getTranslations(language);
-  const [nextUp, ...waiting] = players;
+  // When multiple players are on the bench they all rotate in together —
+  // so distinguish next/waiting only when exactly one player is sitting out.
+  const showNextWaiting = players.length === 1;
+  const [firstPlayer, ...restPlayers] = players;
 
   return (
     <div className="bg-slate-800 rounded-xl px-3.5 py-2.5 border border-dashed border-slate-600">
@@ -16,20 +19,19 @@ export function BenchDisplay({ players, language }: BenchDisplayProps) {
       </div>
       <div className="flex flex-wrap gap-2 justify-center">
         <div className="flex items-center gap-1.5 bg-yellow-500/15 border border-yellow-500/40 rounded-lg px-2.5 py-1">
-          <span className="text-[10px] font-bold text-yellow-400 tracking-wide uppercase">
-            {t.bench.nextUp}
-          </span>
-          <span className="text-base font-bold text-slate-50">{nextUp}</span>
+          {showNextWaiting && (
+            <span className="text-[10px] font-bold text-yellow-400 tracking-wide uppercase">
+              {t.bench.nextUp}
+            </span>
+          )}
+          <span className="text-base font-bold text-slate-50">{firstPlayer}</span>
         </div>
-        {waiting.map((player) => (
+        {restPlayers.map((player) => (
           <div
             key={player}
-            className="flex items-center gap-1.5 bg-slate-700/60 border border-slate-600 rounded-lg px-2.5 py-1"
+            className="flex items-center gap-1.5 bg-yellow-500/15 border border-yellow-500/40 rounded-lg px-2.5 py-1"
           >
-            <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-              {t.bench.waiting}
-            </span>
-            <span className="text-base font-semibold text-slate-300">{player}</span>
+            <span className="text-base font-bold text-slate-50">{player}</span>
           </div>
         ))}
       </div>
